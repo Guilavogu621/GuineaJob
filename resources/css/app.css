@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 14px; /* Corps de texte par défaut */
+        color: #2C2C2A; /* Gris foncé CDC */
+    }
+
+    h1 {
+        @apply text-[32px] font-medium leading-tight;
+    }
+
+    h2 {
+        @apply text-[22px] font-medium leading-tight;
+    }
+
+    h3 {
+        @apply text-[16px] font-medium leading-tight;
+    }
+
+    code, pre {
+        @apply font-mono text-[12px];
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-guinea-green text-white px-4 py-2 rounded-lg font-medium transition-colors hover:bg-guinea-green-light;
+    }
+    
+    .card-guinea {
+        @apply bg-white border-[0.5px] border-gray-300 rounded-xl shadow-sm p-6;
+    }
+}
