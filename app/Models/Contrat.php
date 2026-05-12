@@ -43,6 +43,18 @@ class Contrat extends Model
         'sent_at' => 'datetime',
     ];
 
+    /**
+     * Logique automatique à la création
+     */
+    protected static function booted()
+    {
+        static::creating(function ($contrat) {
+            if (!$contrat->numero_contrat) {
+                $contrat->numero_contrat = 'CTR-' . date('Y') . '-' . strtoupper(\Illuminate\Support\Str::random(6));
+            }
+        });
+    }
+
     public function employe()
     {
         return $this->belongsTo(Employe::class);

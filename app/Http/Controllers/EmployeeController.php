@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contrat;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
+/**
+ * Contrôleur pour la gestion de l'espace Employé.
+ * Gère le dashboard personnel et la signature des contrats.
+ */
 class EmployeeController extends Controller
 {
     /**
-     * Dashboard de l'employé
+     * Affiche le tableau de bord de l'employé.
      */
-    public function dashboard()
+    public function dashboard(): View
     {
         $user = Auth::user();
         $employe = $user->employe;
@@ -20,9 +26,9 @@ class EmployeeController extends Controller
     }
 
     /**
-     * Affichage du contrat de travail (GUIN-2)
+     * Affiche le contrat de travail pour consultation et signature.
      */
-    public function showContract()
+    public function showContract(): View|RedirectResponse
     {
         $user = Auth::user();
         $employe = $user->employe;
@@ -31,7 +37,7 @@ class EmployeeController extends Controller
             return back()->with('error', 'Aucune fiche employé trouvée pour votre compte.');
         }
 
-        // Récupérer le dernier contrat qui a été au moins ENVOYÉ (pas les brouillons)
+        // Récupère le contrat le plus récent (exclut les brouillons non envoyés)
         $contract = $employe->contrats()
                             ->where('statut', '!=', Contrat::STATUS_DRAFT)
                             ->latest()
@@ -40,19 +46,22 @@ class EmployeeController extends Controller
         return view('employee.contracts.show', compact('user', 'employe', 'contract'));
     }
 
-    public function signContractEmployee(Request $request, Contrat $contract)
+    /**
+     * Procède à la signature électronique finale du contrat par l'employé.
+     */
+    public function signContractEmployee(Request $request, Contrat $contract): RedirectResponse
     {
-        // VERIFICATION EXPERT : L'employeur doit avoir signé en premier
+        // VERIFICATION EXPERT : L'employeur doit avoir signé en premier pour la validité légale
         if (!$contract->signed_at_employer) {
             return back()->with('error', 'L\'employeur doit signer le contrat avant vous.');
         }
 
         $contract->update([
-            'statut' => Contrat::STATUS_ACTIVE, // Devient actif après la signature finale
+            'statut' => Contrat::STATUS_ACTIVE, // Le contrat devient officiellement Actif
             'signed_at_employee' => now(),
             'ip_employee' => $request->ip(),
         ]);
 
-        return back()->with('success', 'Félicitations ! Vous avez signé votre contrat de travail.');
+        return back()->with('success', 'Félicitations ! Votre contrat est désormais signé et actif.');
     }
 }

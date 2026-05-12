@@ -5,28 +5,43 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Employe;
 use App\Models\Contrat;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
 
+/**
+ * Contrôleur pour la gestion de l'espace Employeur.
+ * Gère les employés, les contrats et les paramètres de compte.
+ */
 class EmployerController extends Controller
 {
-    public function dashboard()
+    /**
+     * Dashboard de l'employeur.
+     */
+    public function dashboard(): View
     {
         $user = Auth::user();
         $entreprise = $user->entreprise;
         return view('employer.dashboard', compact('user', 'entreprise'));
     }
 
-    public function showChangePassword()
+    /**
+     * Affiche le formulaire de changement de mot de passe.
+     */
+    public function showChangePassword(): View
     {
         return view('auth.change-password');
     }
 
-    public function updatePassword(Request $request)
+    /**
+     * Met à jour le mot de passe de l'utilisateur.
+     */
+    public function updatePassword(Request $request): RedirectResponse
     {
         $request->validate([
             'password' => ['required', 'confirmed', Password::defaults()],
@@ -40,9 +55,10 @@ class EmployerController extends Controller
         return redirect('/employer/dashboard')->with('success', 'Votre mot de passe a été mis à jour avec succès.');
     }
 
-    // --- Gestion des employés ---
-
-    public function indexEmployees()
+    /**
+     * Liste tous les employés de l'entreprise.
+     */
+    public function indexEmployees(): View
     {
         $entreprise = Auth::user()->entreprise;
         $employees = $entreprise->employes()->with('user')->get();
@@ -50,12 +66,18 @@ class EmployerController extends Controller
         return view('employer.employees.index', compact('employees'));
     }
 
-    public function createEmployee()
+    /**
+     * Formulaire de création d'un employé.
+     */
+    public function createEmployee(): View
     {
         return view('employer.employees.create');
     }
 
-    public function storeEmployee(Request $request)
+    /**
+     * Enregistre un nouvel employé et crée son compte utilisateur.
+     */
+    public function storeEmployee(Request $request): RedirectResponse
     {
         $request->validate([
             'nom' => 'required|string|max:100',
@@ -72,10 +94,10 @@ class EmployerController extends Controller
             'salaire_base' => 'required|numeric|min:0',
         ]);
 
-        // Utilisation d'une transaction pour garantir l'intégrité des données
         $result = DB::transaction(function () use ($request) {
-            // 1. Création de l'utilisateur
             $tempPassword = Str::random(16);
+            
+            // Création du compte utilisateur
             $user = User::create([
                 'nom' => $request->nom,
                 'prenom' => $request->prenom,
@@ -85,14 +107,12 @@ class EmployerController extends Controller
                 'must_change_password' => true,
             ]);
 
-            // 2. Création de la fiche employé
-            $matricule = 'EMP-' . strtoupper(Str::random(6));
-            Employe::create([
+            // Création de la fiche employé (le matricule est généré par le modèle)
+            $employe = Employe::create([
                 'user_id' => $user->id,
                 'entreprise_id' => Auth::user()->entreprise->id,
                 'poste' => $request->poste,
                 'date_embauche' => $request->date_embauche,
-                'numero_matricule' => $matricule,
                 'date_naissance' => $request->date_naissance,
                 'lieu_naissance' => $request->lieu_naissance,
                 'genre' => $request->genre,
@@ -102,7 +122,7 @@ class EmployerController extends Controller
                 'salaire_base' => $request->salaire_base,
             ]);
 
-            return ['user' => $user, 'matricule' => $matricule, 'tempPassword' => $tempPassword];
+            return ['user' => $user, 'matricule' => $employe->numero_matricule, 'tempPassword' => $tempPassword];
         });
 
         return redirect()->route('employer.employees.index')
@@ -111,23 +131,30 @@ class EmployerController extends Controller
             ->with('new_employee_email', $result['user']->email);
     }
 
-    // --- Gestion des contrats (GUIN-2) ---
-
-    public function indexContracts()
+    /**
+     * Liste des contrats de l'entreprise.
+     */
+    public function indexContracts(): View
     {
         $entreprise = Auth::user()->entreprise;
         $contracts = $entreprise->contrats()->with('employe.user')->latest()->get();
         return view('employer.contracts.index', compact('contracts'));
     }
 
-    public function createContract()
+    /**
+     * Formulaire de création d'un contrat.
+     */
+    public function createContract(): View
     {
         $entreprise = Auth::user()->entreprise;
         $employees = $entreprise->employes()->with('user')->get();
         return view('employer.contracts.create', compact('employees'));
     }
 
-    public function storeContract(Request $request)
+    /**
+     * Génère un nouveau contrat de travail.
+     */
+    public function storeContract(Request $request): RedirectResponse
     {
         $request->validate([
             'employe_id' => 'required|exists:employes,id',
@@ -142,32 +169,20 @@ class EmployerController extends Controller
             'required' => 'Le champ :attribute est obligatoire.',
             'required_if' => 'La :attribute est obligatoire pour un contrat de type :value.',
             'exists' => 'L\'employé sélectionné n\'existe pas.',
-            'date' => 'La date saisie n\'est pas valide.',
             'after' => 'La date de fin doit être après la date de début.',
-            'numeric' => 'Le salaire doit être un nombre.',
-        ], [
-            'employe_id' => 'employé',
-            'type_contrat' => 'type de contrat',
-            'date_debut' => 'date de début',
-            'date_fin' => 'date de fin',
-            'salaire_mensuel_brut' => 'salaire mensuel brut',
         ]);
 
         $entreprise = Auth::user()->entreprise;
-
-        // VERIFICATION EXPERT : L'employé appartient-il bien à cette entreprise ?
         $employe = $entreprise->employes()->find($request->employe_id);
+
         if (!$employe) {
-            return back()->withErrors(['employe_id' => 'Action non autorisée. Cet employé ne fait pas partie de votre entreprise.']);
+            return back()->withErrors(['employe_id' => 'Accès refusé : cet employé n\'appartient pas à votre structure.']);
         }
 
-        // Génération d'un numéro de contrat unique (Ex: CTR-2026-XXXX)
-        $numero = 'CTR-' . date('Y') . '-' . strtoupper(Str::random(6));
-
+        // Création du contrat (le numéro est généré par le modèle)
         $contract = Contrat::create([
             'employe_id' => $employe->id,
             'entreprise_id' => $entreprise->id,
-            'numero_contrat' => $numero,
             'type_contrat' => $request->type_contrat,
             'date_debut' => $request->date_debut,
             'date_fin' => $request->date_fin,
@@ -178,10 +193,14 @@ class EmployerController extends Controller
             'statut' => Contrat::STATUS_DRAFT,
         ]);
 
-        return redirect()->route('employer.contracts.index')->with('success', "Contrat {$numero} généré avec succès.");
+        return redirect()->route('employer.contracts.index')
+            ->with('success', "Contrat {$contract->numero_contrat} généré avec succès.");
     }
 
-    public function sendContract(Contrat $contract)
+    /**
+     * Envoie le contrat à l'employé.
+     */
+    public function sendContract(Contrat $contract): RedirectResponse
     {
         $contract->update([
             'statut' => Contrat::STATUS_SENT,
@@ -191,7 +210,10 @@ class EmployerController extends Controller
         return back()->with('success', 'Le contrat a été envoyé à l\'employé pour consultation.');
     }
 
-    public function signContractEmployer(Request $request, Contrat $contract)
+    /**
+     * Signature électronique par l'employeur.
+     */
+    public function signContractEmployer(Request $request, Contrat $contract): RedirectResponse
     {
         $contract->update([
             'statut' => Contrat::STATUS_SIGNED_EMPLOYER,

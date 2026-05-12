@@ -21,6 +21,23 @@ class Employe extends Model
         'salaire_base',
     ];
 
+    protected $casts = [
+        'date_embauche' => 'date',
+        'date_naissance' => 'date',
+    ];
+
+    /**
+     * Logique automatique à la création
+     */
+    protected static function booted()
+    {
+        static::creating(function ($employe) {
+            if (!$employe->numero_matricule) {
+                $employe->numero_matricule = 'EMP-' . strtoupper(\Illuminate\Support\Str::random(6));
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
