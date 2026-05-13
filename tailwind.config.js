@@ -15,6 +15,14 @@ export default {
                 sans: ['Inter', ...defaultTheme.fontFamily.sans],
             },
             colors: {
+                'guinea-user': '#534AB7',       // Violet - Utilisateurs
+                'guinea-entreprise': '#0F6E56', // Vert - Entreprise & Contrat
+                'guinea-employe': '#185FA5',    // Bleu - Employé, OffreEmploi, Candidature
+                'guinea-paie': '#BA7517',       // Or - FichePaie
+                'guinea-conge': '#D4537E',      // Rose - Congé
+                'guinea-ao': '#639922',         // Vert clair - AppelOffres
+                'guinea-notif': '#D85A30',      // Orange - Notification
+                // Conserver l'existant pour la rétrocompatibilité (Contrat existant)
                 'guinea-green': {
                     DEFAULT: '#0F6E56',
                     light: '#1D9E75',

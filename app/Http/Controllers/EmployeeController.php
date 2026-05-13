@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 /**
  * Contrôleur pour la gestion de l'espace Employé.
@@ -14,6 +15,22 @@ use Illuminate\View\View;
  */
 class EmployeeController extends Controller
 {
+    /**
+     * Génère et télécharge le contrat en PDF.
+     */
+    public function downloadPdf(Contrat $contract)
+    {
+        $user = Auth::user();
+        
+        // SECURITÉ : Seul l'employé propriétaire du contrat peut le télécharger
+        if ($contract->employe_id !== $user->employe->id) {
+            abort(403, 'Action non autorisée.');
+        }
+
+        $pdf = Pdf::loadView('contracts.pdf', compact('contract'));
+        
+        return $pdf->download('Contrat_GuineJob_' . $contract->numero_contrat . '.pdf');
+    }
     /**
      * Affiche le tableau de bord de l'employé.
      */

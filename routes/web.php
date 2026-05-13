@@ -43,15 +43,23 @@ Route::middleware(['auth', 'password.change', 'role:employeur'])->prefix('employ
     Route::get('/employees', [\App\Http\Controllers\EmployerController::class, 'indexEmployees'])->name('employees.index');
     Route::get('/employees/create', [\App\Http\Controllers\EmployerController::class, 'createEmployee'])->name('employees.create');
     Route::post('/employees/store', [\App\Http\Controllers\EmployerController::class, 'storeEmployee'])->name('employees.store');
+    Route::get('/employees/{employe}/edit', [\App\Http\Controllers\EmployerController::class, 'editEmployee'])->name('employees.edit');
+    Route::post('/employees/{employe}/update', [\App\Http\Controllers\EmployerController::class, 'updateEmployee'])->name('employees.update');
 
     // Gestion des contrats (GUIN-2)
     Route::get('/contracts', [\App\Http\Controllers\EmployerController::class, 'indexContracts'])->name('contracts.index');
     Route::get('/contracts/create', [\App\Http\Controllers\EmployerController::class, 'createContract'])->name('contracts.create');
     Route::post('/contracts/store', [\App\Http\Controllers\EmployerController::class, 'storeContract'])->name('contracts.store');
+    Route::get('/contracts/{contract}/edit', [\App\Http\Controllers\EmployerController::class, 'editContract'])->name('contracts.edit');
+    Route::post('/contracts/{contract}/update', [\App\Http\Controllers\EmployerController::class, 'updateContract'])->name('contracts.update');
+    Route::get('/contracts/{contract}/terminate', [\App\Http\Controllers\EmployerController::class, 'showTerminate'])->name('contracts.terminate');
+    Route::post('/contracts/{contract}/terminate', [\App\Http\Controllers\EmployerController::class, 'processTerminate'])->name('contracts.process-terminate');
     
     // Workflow Signature Employeur
     Route::post('/contracts/{contract}/send', [\App\Http\Controllers\EmployerController::class, 'sendContract'])->name('contracts.send');
+    Route::get('/contracts/{contract}', [\App\Http\Controllers\EmployerController::class, 'showContract'])->name('contracts.show');
     Route::post('/contracts/{contract}/sign', [\App\Http\Controllers\EmployerController::class, 'signContractEmployer'])->name('contracts.sign');
+    Route::get('/contracts/{contract}/download', [\App\Http\Controllers\EmployerController::class, 'downloadPdf'])->name('contracts.download');
 });
 
 // Routes Employé
@@ -61,6 +69,7 @@ Route::middleware(['auth', 'password.change', 'role:employe'])->prefix('employee
     
     // Workflow Signature Employé
     Route::post('/contract/{contract}/sign', [\App\Http\Controllers\EmployeeController::class, 'signContractEmployee'])->name('contract.sign');
+    Route::get('/contract/{contract}/download', [\App\Http\Controllers\EmployeeController::class, 'downloadPdf'])->name('contract.download');
 });
 
 require __DIR__.'/auth.php';

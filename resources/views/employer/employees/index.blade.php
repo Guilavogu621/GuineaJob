@@ -63,9 +63,13 @@
                                         {{ $employee->date_embauche }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="#" class="text-guinea-gold hover:text-orange-700">Modifier</a>
+                                        <a href="{{ route('employer.employees.edit', $employee) }}" class="text-guinea-gold hover:text-orange-700 font-bold">Modifier</a>
                                         <span class="mx-2 text-gray-300">|</span>
-                                        <a href="#" class="text-guinea-green hover:text-green-800 font-bold">Voir contrat</a>
+                                        @if($employee->contrats->count() > 0)
+                                            <a href="{{ route('employer.contracts.show', $employee->contrats->sortByDesc('created_at')->first()) }}" class="text-guinea-green hover:text-green-800 font-bold">Voir contrat</a>
+                                        @else
+                                            <a href="{{ route('employer.contracts.create') }}" class="text-gray-400 hover:text-gray-600 italic">Nouveau contrat</a>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

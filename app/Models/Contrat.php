@@ -14,6 +14,15 @@ class Contrat extends Model
     const STATUS_ACTIVE = 'Actif';
     const STATUS_CANCELLED = 'Annulé';
 
+    // Types de résiliation légaux
+    const RUPTURE_DEMISSION = 'Démission';
+    const RUPTURE_LICENCIEMENT = 'Licenciement';
+    const RUPTURE_ACCORD = 'Commun accord';
+    const RUPTURE_FIN_CDD = 'Fin de contrat';
+    const RUPTURE_FAUTE_GRAVE = 'Faute grave';
+    const RUPTURE_STAGE_ABANDON = 'Abandon de stage';
+    const RUPTURE_STAGE_EMBAUCHE = 'Embauche après stage';
+
     protected $fillable = [
         'employe_id',
         'entreprise_id',
@@ -32,15 +41,21 @@ class Contrat extends Model
         'signed_at_employee',
         'ip_employee',
         'sent_at',
+        'type_resiliation',
+        'motif_resiliation',
+        'date_resiliation',
+        'resilie_at',
     ];
 
     protected $casts = [
         'avantages' => 'array',
         'date_debut' => 'date',
         'date_fin' => 'date',
+        'date_resiliation' => 'date',
         'signed_at_employer' => 'datetime',
         'signed_at_employee' => 'datetime',
         'sent_at' => 'datetime',
+        'resilie_at' => 'datetime',
     ];
 
     /**

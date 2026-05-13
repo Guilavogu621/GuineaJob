@@ -51,5 +51,11 @@ class Employe extends Model
     public function contrats()
     {
         return $this->hasMany(Contrat::class);
+    /**
+     * Les demandes de congés de l'employé.
+     */
+    public function conges()
+    {
+        return $this->hasMany(Conge::class);
     }
 }

@@ -70,29 +70,44 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm flex items-center gap-3">
-                                            @if(trim($contract->statut) === 'Brouillon')
+                                            @if($contract->isDraft())
                                                 <form action="{{ route('employer.contracts.send', $contract) }}" method="POST">
                                                     @csrf
                                                     <button class="bg-[#0F6E56] text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#085041] transition-all shadow-md flex items-center gap-2">
                                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                                                        Envoyer
+                                                        1. Envoyer
                                                     </button>
                                                 </form>
                                             @endif
                                             
-                                            @if(trim($contract->statut) === 'Envoyé')
-                                                <form action="{{ route('employer.contracts.sign', $contract) }}" method="POST">
-                                                    @csrf
-                                                    <button class="bg-[#D4AF37] text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-md flex items-center gap-2">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                                        Signer
-                                                    </button>
-                                                </form>
+                                            @if($contract->isSent())
+                                                <a href="{{ route('employer.contracts.show', $contract) }}" class="bg-[#D4AF37] text-white px-6 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl flex items-center gap-2 ring-2 ring-orange-200 animate-pulse">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                                    2. SIGNER LE CONTRAT 🖋️
+                                                </a>
                                             @endif
 
-                                            <button class="text-[#0F6E56] hover:text-[#D4AF37] font-black text-[11px] uppercase tracking-tighter transition-colors">
+                                            <a href="{{ route('employer.contracts.show', $contract) }}" class="text-[#0F6E56] hover:text-[#D4AF37] font-black text-[11px] uppercase tracking-tighter transition-colors flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                 Détails
-                                            </button>
+                                            </a>
+
+                                            <a href="{{ route('employer.contracts.download', $contract) }}" class="text-guinea-green hover:text-green-700 font-black text-[11px] uppercase tracking-tighter transition-colors flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                PDF
+                                            </a>
+
+                                            @if(!$contract->isSignedByEmployee())
+                                                <a href="{{ route('employer.contracts.edit', $contract) }}" class="text-blue-600 hover:text-blue-800 font-black text-[11px] uppercase tracking-tighter transition-colors">
+                                                    Modifier
+                                                </a>
+                                            @endif
+
+                                            @if($contract->statut !== \App\Models\Contrat::STATUS_CANCELLED)
+                                                <a href="{{ route('employer.contracts.terminate', $contract) }}" class="text-red-600 hover:text-red-800 font-black text-[11px] uppercase tracking-tighter transition-colors">
+                                                    Résilier
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
