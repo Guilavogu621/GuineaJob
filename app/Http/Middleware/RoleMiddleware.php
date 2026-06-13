@@ -20,13 +20,14 @@ class RoleMiddleware
 
         $user = Auth::user();
 
-        // Vérification du rôle
-        if ($user->role !== $role) {
+        // Vérification du rôle via Spatie
+        if (!$user->hasRole($role)) {
             // Si l'utilisateur n'a pas le bon rôle, on le renvoie vers son propre dashboard
-            if ($user->role === 'admin') return redirect()->route('admin.dashboard');
-            if ($user->role === 'employeur') return redirect()->route('employer.dashboard');
-            if ($user->role === 'employe') return redirect()->route('employee.dashboard');
-            
+            if ($user->hasRole('admin')) return redirect()->route('admin.dashboard');
+            if ($user->hasRole('employeur')) return redirect()->route('employer.dashboard');
+            if ($user->hasRole('employe')) return redirect()->route('employee.dashboard');
+            if ($user->hasRole(['candidat', 'prestataire'])) return redirect()->route('dashboard');
+
             return redirect('/');
         }
 
