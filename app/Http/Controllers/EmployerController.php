@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Employe;
 use App\Models\Contrat;
+use App\Services\SignatureService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,21 +27,109 @@ class EmployerController extends Controller
      */
     public function downloadPdf(Contrat $contract)
     {
+        // SECURITÉ : Seul l'employeur propriétaire peut télécharger
         if ($contract->entreprise_id !== Auth::user()->entreprise->id) {
             abort(403);
         }
 
+        // Si un PDF signé existe déjà sur le disque, on le sert directement
+        if ($contract->document_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($contract->document_path)) {
+            return response()->download(storage_path('app/public/' . $contract->document_path));
+        }
+
         $pdf = Pdf::loadView('contracts.pdf', compact('contract'));
-        return $pdf->download('Contrat_Expert_' . $contract->numero_contrat . '.pdf');
+        return $pdf->download('Contrat_' . $contract->numero_contrat . '.pdf');
     }
     /**
-     * Dashboard de l'employeur.
+     * Dashboard de l'employeur (CDC Section 7.3).
+     * KPIs : Contrats actifs, Masse salariale, Congés en attente, Candidatures.
      */
     public function dashboard(): View
     {
         $user = Auth::user();
         $entreprise = $user->entreprise;
-        return view('employer.dashboard', compact('user', 'entreprise'));
+
+        // --- KPIs (Cartes supérieures) ---
+        $totalEmployees = Contrat::where('entreprise_id', $entreprise->id)->where('statut', Contrat::STATUS_ACTIVE)->count();
+
+        $newHires = Contrat::where('entreprise_id', $entreprise->id)
+            ->where('statut', Contrat::STATUS_ACTIVE)
+            ->whereMonth('date_debut', now()->month)
+            ->count();
+
+        $openPositions = \App\Models\OffreEmploi::where('entreprise_id', $entreprise->id)
+            ->where('statut', \App\Models\OffreEmploi::STATUS_PUBLISHED)
+            ->count();
+
+        $congesEnAttente = \App\Models\Conge::whereHas('employe', fn($q) => $q->where('entreprise_id', $entreprise->id))
+            ->where('statut', \App\Models\Conge::STATUS_PENDING)
+            ->count();
+
+        // Taux de présence simulé ou basé sur les congés
+        $employesEnCongeAujourdhui = \App\Models\Conge::whereHas('employe', fn($q) => $q->where('entreprise_id', $entreprise->id))
+            ->whereIn('statut', [\App\Models\Conge::STATUS_APPROVED])
+            ->where('date_debut', '<=', now())
+            ->where('date_fin', '>=', now())
+            ->count();
+
+        $attendanceRate = $totalEmployees > 0
+            ? round((($totalEmployees - $employesEnCongeAujourdhui) / $totalEmployees) * 100, 1)
+            : 100;
+
+        // Candidatures récentes (en remplacement des "Upcoming Reviews" si le module n'existe pas)
+        $recentApplicationsCount = \App\Models\Candidature::whereHas('offre', fn($q) => $q->where('entreprise_id', $entreprise->id))
+            ->where('statut', \App\Models\Conge::STATUS_PENDING)
+            ->count();
+
+        // --- Graphiques (ApexCharts) ---
+        // 1. Headcount Trend (6 derniers mois)
+        $headcountTrend = [];
+        $headcountMonths = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $headcountMonths[] = $month->format('M');
+            // Cumul des contrats actifs créés jusqu'à ce mois
+            $count = Contrat::where('entreprise_id', $entreprise->id)
+                ->where('statut', Contrat::STATUS_ACTIVE)
+                ->where('date_debut', '<=', $month->endOfMonth())
+                ->count();
+            $headcountTrend[] = $count;
+        }
+
+        // 2. Department Distribution (selon le champ "poste" pour l'instant)
+        $departementsData = \App\Models\Employe::selectRaw('poste, count(*) as count')
+            ->where('entreprise_id', $entreprise->id)
+            ->whereHas('contrats', fn($q) => $q->where('statut', Contrat::STATUS_ACTIVE))
+            ->groupBy('poste')
+            ->pluck('count', 'poste')
+            ->toArray();
+
+        $deptLabels = array_keys($departementsData);
+        $deptSeries = array_values($departementsData);
+
+        // --- Activités récentes ---
+        $recentActivities = \App\Models\Candidature::with(['user', 'offre'])
+            ->whereHas('offre', fn($q) => $q->where('entreprise_id', $entreprise->id))
+            ->latest()
+            ->take(4)
+            ->get();
+
+        // --- Événements à venir ---
+        // Récupération des congés approuvés à venir
+        $upcomingEvents = \App\Models\Conge::with(['employe.user'])
+            ->whereHas('employe', fn($q) => $q->where('entreprise_id', $entreprise->id))
+            ->whereIn('statut', [\App\Models\Conge::STATUS_APPROVED])
+            ->where('date_debut', '>', now())
+            ->orderBy('date_debut')
+            ->take(3)
+            ->get();
+
+        return view('employer.dashboard', compact(
+            'user', 'entreprise', 'totalEmployees', 'newHires', 'openPositions',
+            'congesEnAttente', 'attendanceRate', 'recentApplicationsCount',
+            'headcountTrend', 'headcountMonths', 'deptLabels', 'deptSeries',
+            'recentActivities', 'upcomingEvents'
+        ));
     }
 
     /**
@@ -69,13 +158,40 @@ class EmployerController extends Controller
     }
 
     /**
-     * Liste tous les employés de l'entreprise.
+     * Liste tous les employés de l'entreprise avec filtres.
      */
-    public function indexEmployees(): View
+    public function indexEmployees(Request $request): View
     {
         $entreprise = Auth::user()->entreprise;
-        $employees = $entreprise->employes()->with('user')->get();
-        
+        $query = $entreprise->employes()->with(['user', 'contrats']);
+
+        // Recherche par nom, prénom ou matricule
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero_matricule', 'like', "%{$search}%")
+                  ->orWhere('poste', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($qu) use ($search) {
+                      $qu->where('nom', 'like', "%{$search}%")
+                        ->orWhere('prenom', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filtre par type de contrat
+        if ($request->filled('type')) {
+            $query->where('type_contrat', $request->type);
+        }
+
+        // Tri
+        if ($request->filled('sort') && $request->sort === 'oldest') {
+            $query->oldest();
+        } else {
+            $query->latest();
+        }
+
+        $employees = $query->get();
+
         return view('employer.employees.index', compact('employees'));
     }
 
@@ -103,13 +219,13 @@ class EmployerController extends Controller
             'genre' => 'required|in:Masculin,Féminin',
             'adresse' => 'required|string|max:255',
             'telephone' => 'required|string|max:20',
-            'type_contrat' => 'required|in:CDI,CDD',
+            'type_contrat' => 'required|in:CDI,CDD,Stage,Prestation',
             'salaire_base' => 'required|numeric|min:0',
         ]);
 
         $result = DB::transaction(function () use ($request) {
             $tempPassword = Str::random(16);
-            
+
             // Création du compte utilisateur
             $user = User::create([
                 'nom' => $request->nom,
@@ -119,6 +235,13 @@ class EmployerController extends Controller
                 'role' => 'employe',
                 'must_change_password' => true,
             ]);
+
+            // Assigner le rôle Spatie
+            try {
+                $user->assignRole('employe');
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Spatie role assign failed: ' . $e->getMessage());
+            }
 
             // Création de la fiche employé (le matricule est généré par le modèle)
             $employe = Employe::create([
@@ -171,7 +294,7 @@ class EmployerController extends Controller
             'poste' => 'required|string|max:100',
             'adresse' => 'required|string|max:255',
             'telephone' => 'required|string|max:20',
-            'type_contrat' => 'required|in:CDI,CDD',
+            'type_contrat' => 'required|in:CDI,CDD,Stage,Prestation',
             'salaire_base' => 'required|numeric|min:0',
         ]);
 
@@ -195,12 +318,36 @@ class EmployerController extends Controller
     }
 
     /**
-     * Liste des contrats de l'entreprise.
+     * Liste des contrats de l'entreprise avec filtres.
      */
-    public function indexContracts(): View
+    public function indexContracts(Request $request): View
     {
         $entreprise = Auth::user()->entreprise;
-        $contracts = $entreprise->contrats()->with('employe.user')->latest()->get();
+        $query = $entreprise->contrats()->with('employe.user');
+
+        // Recherche par numéro de contrat ou nom d'employé
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('numero_contrat', 'like', "%{$search}%")
+                  ->orWhereHas('employe.user', function($qu) use ($search) {
+                      $qu->where('nom', 'like', "%{$search}%")
+                        ->orWhere('prenom', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filtre par type
+        if ($request->filled('type')) {
+            $query->where('type_contrat', $request->type);
+        }
+
+        // Filtre par statut
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
+        }
+
+        $contracts = $query->latest()->get();
         return view('employer.contracts.index', compact('contracts'));
     }
 
@@ -241,6 +388,19 @@ class EmployerController extends Controller
         if (!$employe) {
             return back()->withErrors(['employe_id' => 'Accès refusé : cet employé n\'appartient pas à votre structure.']);
         }
+
+        // --- NOUVELLE REGLE DE GESTION ---
+        // Vérifier si l'employé possède déjà un contrat Actif ou en cours de validation
+        $hasActiveContract = $employe->contrats()
+            ->whereIn('statut', [Contrat::STATUS_ACTIVE, Contrat::STATUS_SENT, Contrat::STATUS_SIGNED_EMPLOYER])
+            ->exists();
+
+        if ($hasActiveContract) {
+            return back()
+                ->withErrors(['employe_id' => 'Action refusée : Cet employé possède déjà un contrat actif ou en cours de signature. Vous devez d\'abord résilier son contrat actuel avant de pouvoir lui en affecter un nouveau.'])
+                ->withInput();
+        }
+        // ---------------------------------
 
         // Création du contrat (le numéro est généré par le modèle)
         $contract = Contrat::create([
@@ -294,7 +454,7 @@ class EmployerController extends Controller
     public function editContract(Contrat $contract): View
     {
         if ($contract->entreprise_id !== Auth::user()->entreprise->id) { abort(403); }
-        
+
         if ($contract->isSignedByEmployee()) {
             return back()->with('error', 'Un contrat signé par l\'employé ne peut plus être modifié.');
         }
@@ -369,7 +529,7 @@ class EmployerController extends Controller
                 'Inaptitude médicale',
                 'Embauche en CDI'
             ];
-            
+
             if (!in_array($request->type_resiliation, $motifsAutorises)) {
                 return back()->with('error', 'Un CDD actif ne peut être rompu que pour des motifs légaux spécifiques (Accord, Faute grave, Embauche CDI, etc.).');
             }
@@ -387,20 +547,32 @@ class EmployerController extends Controller
     }
 
     /**
-     * Signature électronique par l'employeur.
+     * Signature électronique par l'employeur avec preuve cryptographique.
      */
-    public function signContractEmployer(Request $request, Contrat $contract): RedirectResponse
+    public function signContractEmployer(Request $request, Contrat $contract, SignatureService $signatureService): RedirectResponse
     {
         if ($contract->entreprise_id !== Auth::user()->entreprise->id) {
             abort(403);
         }
 
+        // 1. Mettre à jour les métadonnées de signature
         $contract->update([
             'statut' => Contrat::STATUS_SIGNED_EMPLOYER,
             'signed_at_employer' => now(),
             'ip_employer' => $request->ip(),
         ]);
 
-        return redirect()->route('employer.contracts.index')->with('success', 'Contrat signé numériquement avec succès.');
+        // 2. Générer le PDF avec les nouvelles informations
+        $pdfPath = 'contrats/Contrat_' . $contract->numero_contrat . '.pdf';
+        $pdf = Pdf::loadView('contracts.pdf', compact('contract'));
+        \Illuminate\Support\Facades\Storage::disk('public')->put($pdfPath, $pdf->output());
+
+        // 3. Signer cryptographiquement le PDF (Génère le .sig)
+        $signatureService->signDocument($pdfPath);
+
+        // 4. Enregistrer le chemin du document
+        $contract->update(['document_path' => $pdfPath]);
+
+        return redirect()->route('employer.contracts.index')->with('success', 'Contrat signé numériquement et sécurisé par OpenSSL.');
     }
 }
