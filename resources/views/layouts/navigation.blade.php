@@ -12,24 +12,33 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    @auth
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+                        @if(Auth::user()->isAdmin())
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                                {{ __('Administration') }}
+                            </x-nav-link>
+                        @endif
+                        @if(Auth::user()->isEmployeur())
+                            <x-nav-link :href="route('employer.dashboard')" :active="request()->routeIs('employer.*')">
+                                {{ __('Mon Espace Entreprise') }}
+                            </x-nav-link>
+                        @endif
+                    @endauth
+                    <x-nav-link :href="route('jobboard.index')" :active="request()->routeIs('jobboard.*')">
+                        {{ __('Offres d\'Emploi') }}
                     </x-nav-link>
-                    @if(Auth::user()->isAdmin())
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-                            {{ __('Administration') }}
-                        </x-nav-link>
-                    @endif
-                    @if(Auth::user()->isEmployeur())
-                        <x-nav-link :href="route('employer.dashboard')" :active="request()->routeIs('employer.*')">
-                            {{ __('Mon Espace Entreprise') }}
-                        </x-nav-link>
-                    @endif
+                    <x-nav-link :href="route('appels.public.index')" :active="request()->routeIs('appels.public.*')">
+                        {{ __('Marchés Publics') }}
+                    </x-nav-link>
                 </div>
             </div>
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -60,6 +69,12 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+                @else
+                <div class="flex items-center space-x-4">
+                    <a href="{{ route('login') }}" class="text-sm text-[#2C2C2A] hover:text-[#0F6E56] font-medium">Connexion</a>
+                                        <a href="{{ route('register') }}" class="text-sm bg-[#0F6E56] text-white px-4 py-2 rounded-lg hover:bg-[#0A5A45] font-medium transition-colors">Inscription</a>
+                </div>
+                @endauth
             </div>
 
             <!-- Hamburger -->
@@ -77,18 +92,32 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            @if(Auth::user()->isAdmin())
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
-                    {{ __('Administration') }}
+            @auth
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
                 </x-responsive-nav-link>
-            @endif
+                @if(Auth::user()->isAdmin())
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                        {{ __('Administration') }}
+                    </x-responsive-nav-link>
+                @endif
+                @if(Auth::user()->isEmployeur())
+                    <x-responsive-nav-link :href="route('employer.dashboard')" :active="request()->routeIs('employer.*')">
+                        {{ __('Mon Espace Entreprise') }}
+                    </x-responsive-nav-link>
+                @endif
+            @endauth
+            <x-responsive-nav-link :href="route('jobboard.index')" :active="request()->routeIs('jobboard.*')">
+                {{ __('Offres d\'Emploi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('appels.public.index')" :active="request()->routeIs('appels.public.*')">
+                {{ __('Marchés Publics') }}
+            </x-responsive-nav-link>
         </div>
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
+            @auth
             <div class="px-4">
                 <div class="font-medium text-base text-gray-800">{{ Auth::user()->prenom }}</div>
                 <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
@@ -110,6 +139,16 @@
                     </x-responsive-nav-link>
                 </form>
             </div>
+            @else
+            <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('login')">
+                    {{ __('Connexion') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('register')">
+                    {{ __('Inscription') }}
+                </x-responsive-nav-link>
+            </div>
+            @endauth
         </div>
     </div>
 </nav>
