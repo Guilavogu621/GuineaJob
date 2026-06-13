@@ -127,11 +127,17 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 flex flex-wrap gap-2">
+                        <div class="mt-4 flex flex-wrap gap-2">
                         <a href="{{ route('employer.contracts.show', $contract) }}" class="btn btn-outline btn-sm">Voir</a>
                         <a href="{{ route('employer.contracts.download', $contract) }}" class="btn btn-secondary btn-sm">PDF</a>
                         @if(!$contract->isSignedByEmployee())
                             <a href="{{ route('employer.contracts.edit', $contract) }}" class="btn btn-outline btn-sm">Modifier</a>
+                        @endif
+                        @if($contract->statut === \App\Models\Contrat::STATUS_DRAFT)
+                            <form action="{{ route('employer.contracts.send', $contract) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="btn btn-primary btn-sm bg-[#0F6E56] hover:bg-[#0A5A45] border-none">Envoyer</button>
+                            </form>
                         @endif
                         @if($contract->statut !== \App\Models\Contrat::STATUS_CANCELLED)
                             <a href="{{ route('employer.contracts.terminate', $contract) }}" class="btn btn-danger btn-sm">Résilier</a>
@@ -224,6 +230,15 @@
                                             <div title="Non modifiable" class="w-7 h-7 rounded-lg flex items-center justify-center text-[#888780] opacity-30 cursor-not-allowed" style="border: 0.5px solid rgba(0,0,0,0.05);">
                                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                             </div>
+                                        @endif
+                                        {{-- Envoyer (Brouillon) --}}
+                                        @if($contract->statut === \App\Models\Contrat::STATUS_DRAFT)
+                                            <form action="{{ route('employer.contracts.send', $contract) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" title="Envoyer le contrat" class="w-7 h-7 rounded-lg flex items-center justify-center text-white bg-[#0F6E56] hover:bg-[#0A5A45]" style="border: 0.5px solid rgba(0,0,0,0.08);">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                                </button>
+                                            </form>
                                         @endif
                                         {{-- Résilier --}}
                                         @if($contract->statut !== \App\Models\Contrat::STATUS_CANCELLED)

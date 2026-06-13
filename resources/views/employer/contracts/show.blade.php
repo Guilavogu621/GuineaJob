@@ -102,7 +102,16 @@
                             </div>
 
                             <div class="flex-1 w-full flex flex-col items-end gap-4">
-                                @if($contract->statut === \App\Models\Contrat::STATUS_SENT)
+                                @if($contract->statut === \App\Models\Contrat::STATUS_DRAFT)
+                                    <form action="{{ route('employer.contracts.send', $contract) }}" method="POST" class="w-full flex flex-col items-end gap-4">
+                                        @csrf
+                                        <button type="submit"
+                                                class="w-full text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-[#0F6E56] hover:bg-[#0A5A45] shadow-2xl">
+                                            ENVOYER LE CONTRAT 📩
+                                        </button>
+                                        <p class="text-xs text-gray-500 text-right w-full">Cliquez pour valider le brouillon et passer à l'étape de signature.</p>
+                                    </form>
+                                @elseif($contract->statut === \App\Models\Contrat::STATUS_SENT)
                                     <form action="{{ route('employer.contracts.sign', $contract) }}" method="POST" class="w-full flex flex-col items-end gap-4">
                                         @csrf
                                         <label class="flex items-center gap-3 cursor-pointer">
