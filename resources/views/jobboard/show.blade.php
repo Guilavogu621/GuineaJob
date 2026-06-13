@@ -25,7 +25,7 @@
                 </div>
                 
                 <div class="w-full md:w-auto">
-                    <a href="{{ route('jobboard.apply', $offre) }}" class="block w-full px-12 py-5 bg-[#0F6E56] text-white text-center font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-[#0F6E56]/30 hover:bg-[#0A5A45] hover:-translate-y-1 transition-all">
+                    <a href="{{ route('candidate.jobs.apply', $offre) }}" class="block w-full px-12 py-5 bg-[#0F6E56] text-white text-center font-black text-sm uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-[#0F6E56]/30 hover:bg-[#0A5A45] hover:-translate-y-1 transition-all">
                         Postuler maintenant
                     </a>
                 </div>
