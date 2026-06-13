@@ -92,7 +92,7 @@
                     </div>
 
                     <!-- Signature Section -->
-                    <div class="mt-16 pt-10 border-t-2 border-dashed border-gray-100" x-data="{ accepted: false }">
+                    <div class="mt-16 pt-10 border-t-2 border-dashed border-gray-100">
                         <div class="flex flex-col md:flex-row justify-between gap-10 items-end">
                             <div class="flex-1 space-y-4">
                                 <h5 class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Certifications de l'Employeur</h5>
@@ -102,28 +102,26 @@
                             </div>
 
                             <div class="flex-1 w-full flex flex-col items-end gap-4">
-                                @if($contract->statut === \App\Models\Contrat::STATUS_DRAFT)
-                                    <form action="{{ route('employer.contracts.send', $contract) }}" method="POST" class="w-full flex flex-col items-end gap-4">
+                                @if(in_array($contract->statut, [\App\Models\Contrat::STATUS_DRAFT, \App\Models\Contrat::STATUS_SENT]))
+                                    <form id="sign-form" action="{{ route('employer.contracts.sign', $contract) }}" method="POST" class="w-full flex flex-col items-end gap-4">
                                         @csrf
-                                        <button type="submit"
-                                                class="w-full text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-[#0F6E56] hover:bg-[#0A5A45] shadow-2xl">
-                                            ENVOYER LE CONTRAT 📩
-                                        </button>
-                                        <p class="text-xs text-gray-500 text-right w-full">Cliquez pour valider le brouillon et passer à l'étape de signature.</p>
-                                    </form>
-                                @elseif($contract->statut === \App\Models\Contrat::STATUS_SENT)
-                                    <form action="{{ route('employer.contracts.sign', $contract) }}" method="POST" class="w-full flex flex-col items-end gap-4">
-                                        @csrf
-                                        <label class="flex items-center gap-3 cursor-pointer">
-                                            <input type="checkbox" x-model="accepted" class="w-5 h-5 text-[#0F6E56] border-gray-300 rounded focus:ring-[#0F6E56]">
+                                        <label class="flex items-center gap-3 cursor-pointer select-none">
+                                            <input
+                                                type="checkbox"
+                                                id="accept-checkbox"
+                                                onchange="document.getElementById('sign-btn').disabled = !this.checked; document.getElementById('sign-btn').classList.toggle('bg-gray-300', !this.checked); document.getElementById('sign-btn').classList.toggle('bg-[#0F6E56]', this.checked); document.getElementById('sign-btn').classList.toggle('hover:bg-[#0A5A45]', this.checked); document.getElementById('sign-btn').classList.toggle('shadow-2xl', this.checked);"
+                                                class="w-5 h-5 accent-[#0F6E56] border-gray-300 rounded"
+                                            >
                                             <span class="text-[15px] text-gray-500 font-black uppercase tracking-tighter italic">Je valide et je signe ce contrat</span>
                                         </label>
-                                        <button type="submit"
-                                                x-bind:disabled="!accepted"
-                                                :class="!accepted ? 'bg-gray-300' : 'bg-[#BA7517] hover:bg-[#9A5F12] shadow-2xl'"
-                                                class="w-full text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all">
-                                            SIGNER LE CONTRAT 🖋️
+                                        <button
+                                            type="submit"
+                                            id="sign-btn"
+                                            disabled
+                                            class="w-full text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-gray-300 cursor-not-allowed">
+                                            VALIDER &amp; SIGNER LE CONTRAT 🖋️
                                         </button>
+                                        <p class="text-xs text-gray-500 text-right w-full">Cochez la case ci-dessus pour activer la signature.</p>
                                     </form>
                                 @elseif($contract->isSignedByEmployer())
                                     <div class="px-8 py-3 bg-[#0F6E56] text-white font-black text-[15px] uppercase tracking-widest rounded-xl shadow-lg flex items-center gap-3">

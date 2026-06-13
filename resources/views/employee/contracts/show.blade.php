@@ -105,7 +105,7 @@
                         </div>
 
                         <!-- Signature -->
-                        <div class="mt-16 pt-10 border-t-2 border-dashed border-gray-100" x-data="{ accepted: false }">
+                        <div class="mt-16 pt-10 border-t-2 border-dashed border-gray-100">
                             <div class="flex flex-col md:flex-row justify-between gap-10 items-end">
                                 <div class="flex-1 space-y-4">
                                     <h5 class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Validations Numériques</h5>
@@ -134,21 +134,27 @@
                                     @elseif($contract->statut === \App\Models\Contrat::STATUS_SIGNED_EMPLOYER)
                                         <form action="{{ route('employee.contract.sign', $contract) }}" method="POST" class="w-full flex flex-col items-end gap-4">
                                             @csrf
-                                            <label class="flex items-center gap-3 cursor-pointer">
-                                                <input type="checkbox" x-model="accepted" class="w-5 h-5 text-[#0F6E56] border-gray-300 rounded focus:ring-[#0F6E56]">
+                                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                                <input
+                                                    type="checkbox"
+                                                    id="emp-accept-checkbox"
+                                                    onchange="document.getElementById('emp-sign-btn').disabled = !this.checked; document.getElementById('emp-sign-btn').classList.toggle('bg-gray-300', !this.checked); document.getElementById('emp-sign-btn').classList.toggle('cursor-not-allowed', !this.checked); document.getElementById('emp-sign-btn').classList.toggle('bg-[#BA7517]', this.checked); document.getElementById('emp-sign-btn').classList.toggle('hover:bg-[#9A5F12]', this.checked); document.getElementById('emp-sign-btn').classList.toggle('shadow-2xl', this.checked);"
+                                                    class="w-5 h-5 accent-[#0F6E56] border-gray-300 rounded"
+                                                >
                                                 <span class="text-[15px] text-gray-500 font-black uppercase tracking-tighter italic">J'accepte et je signe mon contrat</span>
                                             </label>
-                                            <button type="submit"
-                                                    x-bind:disabled="!accepted"
-                                                    :class="!accepted ? 'bg-gray-300' : 'bg-[#BA7517] hover:bg-[#9A5F12] shadow-2xl'"
-                                                    class="w-full text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all">
-                                                Approuver & Signer
+                                            <button
+                                                type="submit"
+                                                id="emp-sign-btn"
+                                                disabled
+                                                class="w-full text-white px-8 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-gray-300 cursor-not-allowed">
+                                                Approuver &amp; Signer
                                             </button>
                                         </form>
                                     @elseif($contract->isSignedByEmployee())
                                         <div class="px-8 py-3 bg-[#0F6E56] text-white font-black text-[15px] uppercase tracking-widest rounded-xl shadow-lg flex items-center gap-3">
                                             <svg class="w-5 h-5 text-guinea-gold" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                                            Document Actif & Authentifié
+                                            Document Actif &amp; Authentifié
                                         </div>
                                     @endif
                                 </div>
