@@ -1,36 +1,53 @@
 <x-guest-layout>
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Récupération</h1>
-        <p class="text-gray-500 mt-2 text-sm">
-            {{ __('Pas de panique. Indiquez-nous votre adresse e-mail et nous vous enverrons un lien de réinitialisation.') }}
+    <div class="mb-8">
+        <h1 class="text-2xl font-medium text-[#2C2C2A]">
+            Mot de passe oublié ?
+        </h1>
+        <p class="text-[15px] text-[#888780] mt-2 leading-relaxed">
+            Pas de panique. Indiquez votre e-mail et nous vous enverrons un lien de réinitialisation sécurisé.
         </p>
     </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <x-auth-session-status class="mb-6" :status="session('status')" />
 
-    <form method="POST" action="{{ route('password.email') }}">
+    <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
         @csrf
 
         <!-- Email Address -->
-        <div class="mb-6">
-            <x-input-label for="email" :value="__('Votre Email')" class="text-xs font-bold uppercase text-gray-400 mb-1" />
-            <x-text-input id="email" class="block mt-1 w-full border-gray-200 focus:border-guinea-green focus:ring-guinea-green rounded-xl py-3 px-4" 
-                        type="email" name="email" :value="old('email')" required autofocus placeholder="nom@entreprise.gn" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div>
+            <x-input-label for="email" :value="__('Adresse email')" />
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#888780]">
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <x-text-input
+                    id="email"
+                    type="email"
+                    name="email"
+                    :value="old('email')"
+                    required
+                    autofocus
+                    class="block w-full pl-9 pr-3 py-2"
+                    placeholder="nom@exemple.gn"
+                />
+            </div>
+            <x-input-error :messages="$errors->get('email')" class="mt-1" />
         </div>
 
-        <div class="flex flex-col gap-4">
-            <x-primary-button class="w-full justify-center bg-guinea-green hover:bg-guinea-green-light text-white py-4 rounded-xl text-base font-bold tracking-widest transition-all shadow-lg shadow-guinea-green/20">
-                {{ __('ENVOYER LE LIEN') }}
-            </x-primary-button>
+        <div class="space-y-6">
+            <button type="submit" class="btn btn-primary w-full justify-center py-2.5">
+                {{ __('Envoyer le lien') }}
+            </button>
 
-            <div class="mt-4 text-center">
-                <a href="{{ route('login') }}" class="text-sm text-gray-500 font-medium hover:text-guinea-green transition-colors">
-                    <i class="fas fa-arrow-left mr-1"></i> Retour à la connexion
+            <div class="text-center mt-6">
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 text-[15px] text-[#0F6E56] hover:underline font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Retour à la connexion
                 </a>
             </div>
         </div>
     </form>
 </x-guest-layout>
-
