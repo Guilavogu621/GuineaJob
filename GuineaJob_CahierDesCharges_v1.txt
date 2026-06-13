@@ -1,0 +1,2584 @@
+GuinéaJob
+Plateforme de Gestion des Contrats de Travail en Guinée
+
+Cahier des Charges & Backlog Produit Agile/Scrum
+
+Auteur
+
+Kowolé Guilavogui
+
+Matricule
+
+664115632377
+
+Date
+
+02 Mai 2026
+
+Version
+
+v1.1 — Renforcée
+
+Stack V1
+
+Laravel · Blade · Tailwind ·
+MySQL
+
+Stack V2
+
+Symfony 6 · Twig · Tailwind ·
+MySQL
+
+Statut
+
+Projet académique — Phase de
+spécification
+
+Langue
+
+Français
+
+GuinéaJob est une plateforme web académique conçue pour répondre à un enjeu majeur
+du marché du travail guinéen : plus de 80% des travailleurs exercent sans contrat
+formel. Ce cahier des charges présente l'architecture complète du projet, ses
+fonctionnalités, sa charte graphique, son backlog Agile/Scrum et sa feuille de route de
+développement en deux versions technologiques (Laravel & Symfony 6).
+
+Sommaire
+PARTIE I — CAHIER DES CHARGES
+1. Présentation du Projet
+
+3
+
+1.1 Contexte général
+
+3
+
+1.2 Présentation de GuinéaJob
+
+3
+
+1.3 Objectifs stratégiques
+
+4
+
+2. Problématique et Objectifs
+
+4
+
+2.1 Problèmes identifiés
+
+4
+
+2.2 Objectifs fonctionnels
+
+5
+
+2.3 Objectifs non fonctionnels
+
+5
+
+3. Acteurs et Rôles
+
+5
+
+4. Fonctionnalités Détaillées
+
+6
+
+4.1 Authentification & Gestion des comptes
+
+6
+
+4.2 Gestion des contrats
+
+6
+
+4.3 Génération PDF & QR Code
+
+6
+
+4.4 Salaires & Fiches de paie
+
+7
+
+4.5 Gestion des congés
+
+7
+
+4.6 Recrutement & Dépôt de CV
+
+7
+
+4.7 Appels d'offres
+
+7
+
+4.8 Tableau de bord & Statistiques
+
+8
+
+4.9 Workflow de création des comptes
+
+8
+
+4.10 Notifications automatiques
+
+8
+
+5. Contraintes Techniques
+
+9
+
+6. Architecture Technique
+
+10
+
+7. Maquettes Descriptives
+
+10
+
+8. Charte Graphique
+
+11
+
+8.1 Identité visuelle — Logo
+
+11
+
+8.2 Palette de couleurs
+
+11
+
+8.3 Typographie
+
+12
+
+8.4 Composants UI
+
+12
+
+9. Gestion des Risques
+
+13
+
+PARTIE II — CONCEPTION
+10. Modèle Conceptuel et Logique (MCD/MLD)
+
+14
+
+10.1 Légende des symboles
+
+14
+
+10.2 Domaine Utilisateurs
+
+15
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 2
+
+10.3 Domaine Contrats
+
+15
+
+10.4 Domaine Salaires & Fiches de Paie
+
+16
+
+10.5 Domaine Recrutement
+
+16
+
+10.6 Domaine Appels d'Offres
+
+17
+
+10.7 Table des Relations (Cardinalités)
+
+17
+
+10.8 Schéma Visuel ERD
+
+18
+
+11. Diagramme des Cas d'Utilisation (Use Case UML)
+
+20
+
+12. Diagramme de Classes (UML)
+
+21
+
+12.1 Version Laravel — Eloquent ORM
+
+22
+
+12.2 Version Symfony 6 — Doctrine ORM
+
+23
+
+13. Diagrammes de Séquence (UML)
+
+24
+
+13.1 DS1 — Connexion sécurisée
+
+25
+
+13.2 DS2 — Signature électronique
+
+26
+
+13.3 DS3 — Demande de congé
+
+27
+
+13.4 DS4 — Génération fiche de paie
+
+28
+
+ANNEXES
+Glossaire
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+29
+
+Page 3
+
+PARTIE I — CAHIER DES CHARGES
+1. Présentation du Projet
+1.1 Contexte général
+La Guinée, pays d'Afrique de l'Ouest, fait face à un défi structurel profond sur son marché du travail : la
+quasi-totalité des relations de travail entre employeurs et employés restent informelles. Selon les
+estimations, plus de 80% des travailleurs guinéens exercent leur activité sans aucun contrat formel,
+les exposant à des abus, des licenciements arbitraires et une absence totale de protection sociale.
+Cette réalité entrave le développement économique, décourage l'investissement étranger et perpétue
+la précarité.
+Dans ce contexte, le numérique représente une opportunité unique de structurer, formaliser et
+sécuriser les relations de travail. C'est dans cette vision que s'inscrit GuinéaJob : transformer une
+problématique sociale en solution technologique concrète.
+
+1.2 Présentation de GuinéaJob
+Définition : GuinéaJob est une plateforme web de gestion des contrats de travail en
+Guinée, développée en deux versions technologiques complémentaires : Version 1
+(Laravel) et Version 2 (Symfony 6). Elle permet la digitalisation complète du cycle de vie
+d'un contrat de travail, de la création à la signature électronique, en passant par la gestion
+des salaires, des congés et du recrutement.
+La plateforme est conçue pour répondre aux besoins de cinq acteurs principaux :
+• Les administrateurs : superviseurs de la plateforme, garants de la conformité.
+• Les employeurs : entreprises et particuliers souhaitant formaliser leurs relations de travail.
+• Les employés : travailleurs bénéficiant d'une protection juridique et d'un accès numérique.
+• Les candidats : chercheurs d'emploi déposant leur CV et postulant aux offres.
+• Les prestataires : répondants aux appels d'offres publiés sur la plateforme.
+
+1.3 Objectifs stratégiques
+• Digitaliser et formaliser les contrats de travail guinéens pour réduire l'emploi informel.
+• Réduire les litiges et les abus dans les relations de travail par la traçabilité numérique.
+• Offrir une solution technologique adaptée au contexte africain (mobile-first, accès simplifié).
+• Contribuer à la transparence et à l'équité sur le marché du travail en Guinée.
+• Démontrer les capacités comparées de deux frameworks PHP majeurs (Laravel et Symfony) sur
+un projet réel.
+• Créer un outil académique reproductible et documenté pouvant servir de référence.
+
+2. Problématique et Objectifs
+2.1 Problèmes identifiés
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 4
+
+#
+
+Problème identifié
+
+Impact
+
+1
+
+Absence de contrats formels (80%+ des
+travailleurs)
+
+Aucune protection juridique en cas de litige
+
+2
+
+Difficultés d'accès aux documents RH
+
+Impossibilité d'accéder à des crédits
+bancaires
+
+3
+
+Processus de recrutement opaques et
+informels
+
+Favoritisme, discrimination, absence de
+traçabilité
+
+4
+
+Gestion des congés non structurée
+
+Abus et conflits récurrents de part et d'autre
+
+5
+
+Appels d'offres non transparents
+
+Corruption et attribution non méritocratique
+
+2.2 Objectifs fonctionnels
+Réf.
+
+Objectif fonctionnel
+
+OF1
+
+Permettre la création, la signature et la gestion de contrats CDI, CDD et Stage.
+
+OF2
+
+Générer des fiches de paie mensuelles en PDF avec QR Code d'authenticité.
+
+OF3
+
+Automatiser la gestion des demandes de congés avec workflow de validation.
+
+OF4
+
+Offrir un module de recrutement avec dépôt de CV en ligne.
+
+OF5
+
+Publier et gérer des appels d'offres de manière transparente.
+
+OF6
+
+Envoyer des notifications automatiques par email à chaque événement clé.
+
+OF7
+
+Fournir des tableaux de bord statistiques personnalisés par profil utilisateur.
+
+2.3 Objectifs non fonctionnels
+Réf.
+
+Critère
+
+Description
+
+ONF1
+
+Sécurité
+
+RBAC, bcrypt, CSRF, sessions sécurisées, HTTPS obligatoire
+
+ONF2
+
+Performance
+
+Temps de réponse < 2s, système de cache pour les dashboards
+
+ONF3
+
+Accessibilité
+
+Design responsive, compatible mobile Android/iOS et desktop
+
+ONF4
+
+Maintenabilité
+
+Code commenté en français, architecture MVC stricte
+
+ONF5
+
+Disponibilité
+
+Uptime cible de 99,5% en phase de production
+
+ONF6
+
+Conformité
+légale
+
+Respect du Code du Travail guinéen (révision 2019)
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 5
+
+3. Acteurs et Rôles
+GuinéaJob distingue cinq types d'acteurs, chacun disposant d'un espace dédié et de permissions
+strictement définies selon son rôle dans la plateforme.
+
+Permissions principales
+
+Création du
+compte
+
+Acteur
+
+Rôle
+
+Admin
+
+Super-gestio
+nnaire
+
+Gestion complète : utilisateurs, contrats,
+offres, statistiques globales, paramétrage,
+modération
+
+Seeder au
+déploiement
+
+Employeu
+r
+
+Entreprise /
+recruteur
+
+Créer/gérer contrats, saisir salaires, valider
+congés, publier offres et appels d'offres
+
+Créé par l'Admin
+
+Employé
+
+Travailleur
+
+Consulter contrat, signer, télécharger PDF,
+soumettre demandes de congé
+
+Créé par
+l'Employeur
+
+Candidat
+
+Chercheur
+d'emploi
+
+Déposer CV, postuler aux offres, suivre ses
+candidatures
+
+Inscription publique
+
+Prestatair
+e
+
+Répondant
+AO
+
+Consulter appels d'offres actifs, soumettre
+réponse, suivre le résultat
+
+Inscription publique
+
+Règle d'accès fondamentale : Aucun Employeur ou Employé ne peut s'inscrire de façon
+autonome. Les comptes sont créés de manière hiérarchique : le Seeder crée l'Admin →
+l'Admin crée les Employeurs → les Employeurs créent les Employés. Chaque nouvel
+utilisateur reçoit ses identifiants par email automatique.
+
+4. Fonctionnalités Détaillées
+4.1 Authentification & Gestion des comptes
+• Connexion sécurisée via email + mot de passe hashé bcrypt — pas d'auto-inscription publique.
+• Le compte Admin est créé automatiquement via un Seeder au déploiement (identifiants fixes
+configurables).
+• L'Admin crée manuellement les comptes Employeurs depuis son tableau de bord.
+• L'Employeur reçoit ses identifiants par email automatique à la création de son compte.
+• L'Employeur crée les comptes Employés depuis son espace — pas d'accès autonome à
+l'inscription.
+• L'Employé reçoit ses identifiants par email automatique à la création de son compte.
+• Réinitialisation du mot de passe par lien temporaire sécurisé envoyé par email.
+• Contrôle d'accès basé sur les rôles (RBAC) avec middleware sur chaque route protégée.
+• Session sécurisée avec expiration automatique après inactivité.
+• Protection CSRF sur tous les formulaires.
+
+4.2 Gestion des contrats
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 6
+
+• Création de contrats CDI, CDD (avec date d'échéance) et Stage (avec convention de formation).
+• Définition des clauses : poste, salaire de base, avantages, lieu de travail, période d'essai.
+• Workflow de signature : Brouillon → Envoyé → Signé employeur → Signé employé → Actif.
+• Historique complet des modifications avec horodatage.
+• Alertes automatiques 30 jours avant l'expiration d'un CDD.
+• Modification et renouvellement d'un contrat existant par l'employeur.
+
+4.3 Génération PDF & QR Code
+• Génération de contrats PDF avec mise en page professionnelle (logo, en-tête, pied de page).
+• QR Code unique pointant vers l'URL de vérification du document sur la plateforme.
+• Fiches de paie PDF mensuelles avec détail des éléments de rémunération.
+• Téléchargement sécurisé : seul le bénéficiaire du document peut le télécharger.
+• Vérification d'authenticité par scan du QR Code accessible sans connexion.
+
+4.4 Gestion des salaires et fiches de paie
+• Saisie du salaire brut mensuel par l'employeur.
+• Calcul automatique des cotisations sociales selon le barème guinéen (CNSS, AGUIPE).
+• Ajout de primes, indemnités, retenues et avantages en nature.
+• Génération automatique de la fiche de paie mensuelle en PDF avec QR Code.
+• Historique complet des fiches de paie consultable par l'employé.
+• Export des données de paie en CSV pour comptabilité.
+
+4.5 Gestion des congés
+• Formulaire de demande de congé : type (annuel, maladie, maternité), dates, motif.
+• Notification automatique à l'employeur lors d'une nouvelle demande.
+• Interface d'approbation / refus pour l'employeur avec commentaire obligatoire.
+• Notification automatique à l'employé lors de la décision.
+• Calcul du solde de congés disponibles selon les paramètres du contrat.
+• Vue calendrier des absences de l'équipe pour l'employeur.
+
+4.6 Recrutement et dépôt de CV
+• Publication d'offres d'emploi avec description, requis, salaire et date limite.
+• Formulaire de candidature avec dépôt de CV (PDF) et lettre de motivation.
+• Interface de gestion des candidatures pour l'employeur (liste, filtre, statut).
+• Suivi du statut de candidature pour le candidat (reçu, en cours, retenu, refusé).
+• Messagerie directe entre employeur et candidat retenu.
+
+4.7 Appels d'offres
+• Publication d'appels d'offres avec cahier des charges téléchargeable.
+• Soumission de réponses par les prestataires (documents, devis PDF).
+• Date limite de soumission avec clôture automatique.
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 7
+
+• Évaluation des offres et attribution par l'employeur.
+• Modération et validation des appels d'offres par l'Admin.
+
+4.8 Tableau de bord et statistiques
+• Dashboard Admin : total entreprises, contrats, employés actifs, offres publiées.
+• Dashboard Employeur : contrats actifs, masse salariale, congés en cours, candidatures.
+• Dashboard Employé : contrat actif, solde de congés, dernières fiches de paie.
+• Graphiques de tendances (contrats créés par mois, recrutements, masse salariale).
+• Export des données en format CSV pour analyse externe.
+
+4.9 Workflow de création des comptes utilisateurs
+GuinéaJob adopte un modèle d'accès fermé et hiérarchique : aucun utilisateur ne peut s'inscrire de
+façon autonome. La création des comptes suit une chaîne stricte initiée par le Seeder au déploiement,
+garantissant ainsi un contrôle total sur les accès à la plateforme.
+
+1
+
+Seeder au déploiement
+Le Seeder crée automatiquement le compte Admin avec des identifiants fixes sécurisés
+configurés dans le fichier .env (email + mot de passe). Cette étape se fait une seule fois lors du
+déploiement initial sur le serveur.
+
+↓
+2
+
+Admin se connecte
+L'Admin se connecte avec les identifiants définis dans le Seeder. Il accède à son tableau de
+bord complet et dispose des droits pour gérer toute la plateforme.
+
+↓
+3
+
+Admin crée les comptes Employeurs
+Depuis son espace, l'Admin crée manuellement les comptes Employeurs (entreprises ou
+individus). Il renseigne : nom, email professionnel, raison sociale, secteur d'activité.
+
+↓
+4
+
+Employeur reçoit ses identifiants par email
+Un email automatique est envoyé à l'Employeur contenant son email de connexion et un mot
+de passe temporaire. L'Employeur est invité à se connecter et à modifier son mot de passe
+lors de sa première connexion.
+
+↓
+5
+
+Employeur crée les comptes Employés
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 8
+
+Une fois connecté, l'Employeur crée les comptes de ses employés depuis son tableau de bord.
+Il renseigne : nom, prénom, email, poste et contrat associé.
+
+↓
+6
+
+Employé reçoit ses identifiants par email
+L'Employé reçoit un email automatique avec ses identifiants de connexion. Il peut
+immédiatement accéder à son espace : consulter son contrat, ses fiches de paie et soumettre
+des demandes de congé.
+
+Note technique : Les mots de passe temporaires sont générés aléatoirement (16
+caractères, alphanumérique) et hashés en bcrypt avant stockage. L'email de bienvenue
+est envoyé via le système de notifications (Laravel Notifications / Symfony Mailer).
+L'utilisateur est forcé de changer son mot de passe à la première connexion (flag
+must_change_password en base).
+
+4.10 Notifications automatiques par email
+Événement déclencheur
+
+Destinataire(s)
+
+Contenu du mail
+
+Création d'un contrat
+
+Employé concerné
+
+Invitation à consulter et signer
+
+Signature du contrat
+
+Employeur
+
+Confirmation de signature de
+l'employé
+
+Demande de congé
+
+Employeur
+
+Récapitulatif de la demande à valider
+
+Validation / Refus congé
+
+Employé
+
+Décision avec motif de l'employeur
+
+Dépôt de CV
+
+Candidat + Employeur
+
+Confirmation de réception
+
+Expiration CDD (-30j)
+
+Employeur + Employé
+
+Rappel avant fin de contrat
+
+Mise en ligne fiche de paie
+
+Employé
+
+Notification de disponibilité PDF
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 9
+
+5. Contraintes Techniques
+Contrainte
+
+Version Laravel
+
+Version Symfony
+
+Framework
+
+Laravel 10.x
+
+Symfony 6.x
+
+Moteur de templates
+
+Blade
+
+Twig
+
+CSS Framework
+
+Tailwind CSS v3
+
+Tailwind CSS v3
+
+Base de données
+
+MySQL 8.x (InnoDB)
+
+MySQL 8.x (InnoDB)
+
+Authentification
+
+Laravel Breeze + Spatie
+
+Symfony Security Component
+
+Génération PDF
+
+DomPDF (barryvdh)
+
+KnpSnappyBundle (wkhtmltopdf)
+
+QR Code
+
+SimpleSoftwareIO/QrCode
+
+endroid/qr-code
+
+Emails
+
+Laravel Notifications (SMTP)
+
+Symfony Mailer (SMTP)
+
+Serveur
+
+Ubuntu 22.04, PHP 8.2, Nginx
+
+Ubuntu 22.04, PHP 8.2, Nginx
+
+Sécurité
+
+HTTPS, bcrypt, CSRF, validation
+serveur
+
+HTTPS, bcrypt, CSRF, validation
+serveur
+
+Langue du code
+
+Commentaires et variables en
+français
+
+Commentaires et variables en
+français
+
+6. Architecture Technique
+GuinéaJob adopte une architecture MVC (Modèle-Vue-Contrôleur) stricte, organisée en couches
+fonctionnelles bien séparées :
+
+Couche Présentation
+
+Vues Blade (V1) / Twig (V2) + Tailwind CSS — Interface utilisateur
+responsive
+
+Couche Contrôleur
+
+Controllers MVC — Logique applicative, validation des requêtes,
+orchestration
+
+Couche Métier
+
+Services & Policies — Règles métier (RBAC, calcul paie, workflow
+contrats)
+
+Couche Données
+
+Modèles Eloquent (V1) / Doctrine (V2) — ORM, migrations, relations
+
+Couche
+Infrastructure
+
+MySQL 8 · Nginx · PHP 8.2 · SMTP · Stockage fichiers (CV, PDF)
+
+Un système de cache applicatif est prévu pour les tableaux de bord statistiques (requêtes
+fréquentes). Une API RESTful interne gère les opérations asynchrones (chargement dynamique des
+données via AJAX/Fetch). Les fichiers uploadés (CV, documents) sont stockés de manière sécurisée
+sur le système de fichiers du serveur avec contrôle d'accès.
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 10
+
+7. Maquettes Descriptives
+7.1 Page d'accueil (Landing Page)
+• Barre de navigation avec logo GuinéaJob et liens (Connexion, Inscription, Offres d'emploi).
+• Hero section avec titre accrocheur, sous-titre et deux CTA : 'Je suis Employeur' / 'Je cherche un
+emploi'.
+• Section fonctionnalités en grille 3 colonnes avec icônes et descriptions.
+• Section statistiques clés (nombre d'entreprises, de contrats, d'employés).
+• Footer avec liens utiles, contact et bande aux couleurs du drapeau guinéen.
+
+7.2 Tableau de bord Admin
+• Sidebar de navigation gauche (vert foncé) : Utilisateurs, Entreprises, Contrats, Recrutement,
+Appels d'offres, Statistiques, Paramètres.
+• Zone principale : 4 cartes KPI (Total entreprises, Total contrats, Employés actifs, Offres publiées).
+• Graphiques en barres et en lignes pour les tendances mensuelles.
+• Tableau des dernières activités : Date, Acteur, Action, Statut.
+
+7.3 Tableau de bord Employeur
+• Sidebar limitée : Mes Contrats, Mes Employés, Salaires, Congés, Recrutement, Appels d'offres.
+• Cartes KPI : Contrats actifs, Masse salariale du mois, Congés en attente, Candidatures reçues.
+• Bouton d'action rapide : Créer un nouveau contrat.
+• Liste des 5 derniers contrats avec statut coloré (badge vert/orange/rouge).
+
+7.4 Tableau de bord Employé
+• Sidebar simplifiée : Mon Contrat, Mes Fiches de Paie, Mes Congés.
+• Carte de contrat actif : type, poste, date de début, statut + bouton Télécharger PDF.
+• Solde de congés avec barre de progression visuelle.
+• Liste des 3 dernières fiches de paie avec bouton de téléchargement.
+
+7.5 Formulaire de création de contrat
+• Stepper à 3 étapes : (1) Informations générales, (2) Conditions financières, (3) Clauses et aperçu.
+• Boutons Précédent / Suivant / Enregistrer comme brouillon / Envoyer pour signature.
+• Aperçu du contrat en temps réel sur le côté droit (mode desktop).
+• Validation en temps réel de chaque champ avec messages d'erreur clairs.
+
+7.6 Page des offres d'emploi (publique)
+• Barre de recherche et filtres (secteur, localisation, type de contrat, niveau d'expérience).
+• Grille de cartes d'offres : logo entreprise, titre, ville, type de contrat, date limite, bouton Postuler.
+• Pagination et chargement dynamique.
+• Vue détail de l'offre avec formulaire de candidature intégré.
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 11
+
+8. Charte Graphique
+La charte graphique de GuinéaJob est inspirée des couleurs nationales de la République de Guinée.
+Elle associe le vert de l'espoir, le jaune/or de la richesse et le rouge du courage à une esthétique
+numérique moderne, épurée et professionnelle.
+
+8.1 Identité visuelle — Logo
+• Symbole : Lettres 'GJ' en blanc sur fond vert primaire, dans un carré aux coins arrondis (10px).
+• Nom : 'GuinéaJob' en 22px, police sans-serif, couleur vert primaire (#0F6E56).
+• Tagline : 'Plateforme de gestion des contrats de travail en Guinée' en 11px, gris moyen.
+• Variante sombre : fond vert primaire, texte blanc, pour en-têtes et impressions.
+• Accent drapeau : bande tricolore (rouge / or / vert) sous le nom, sur la landing page.
+
+8.2 Palette de couleurs
+Nom
+
+Hex
+
+Usage
+
+Aperçu
+
+Vert primaire
+
+#0F6E56
+
+Boutons, navigation, marque
+
+Vert clair
+
+#1D9E75
+
+Hover, liens actifs
+
+Vert pâle
+
+#E1F5EE
+
+Fond succès, badges validés
+
+Or guinéen
+
+#BA7517
+
+Accentuation, alertes importantes
+
+Or pâle
+
+#FAEEDA
+
+Fond avertissements
+
+Rouge guinéen
+
+#993C1D
+
+Danger, refus, erreurs critiques
+
+Rouge pâle
+
+#FCEBEB
+
+Fond erreurs, badges refusés
+
+Gris foncé
+
+#2C2C2A
+
+Texte principal
+
+Gris moyen
+
+#888780
+
+Texte secondaire, labels
+
+Gris chaud
+
+#F1EFE8
+
+Fond de page, surfaces neutres
+
+Blanc pur
+
+#FFFFFF
+
+Fond cartes, modals, formulaires
+
+8.3 Typographie
+Police
+
+Taille
+
+Grais
+se
+
+Titre principal H1
+
+Inter / System Sans
+
+32px
+
+500
+
+Tableau de bord
+
+Titre secondaire H2
+
+Inter / System Sans
+
+22px
+
+500
+
+Gestion des contrats
+
+Titre tertiaire H3
+
+Inter / System Sans
+
+16px
+
+500
+
+Contrat CDI — M. Diallo
+
+Corps de texte
+
+Inter / System Sans
+
+14px
+
+400
+
+Votre contrat a été signé.
+
+Légende / Caption
+
+Inter / System Sans
+
+12px
+
+400
+
+Ref. GJ-2026-0042
+
+Usage
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Exemple
+
+Page 12
+
+Code / Référence
+
+Monospace
+
+12px
+
+400
+
+GJ-2026-0042
+
+8.4 Composants UI — Système de design
+Bouton primaire
+
+Fond vert primaire (#0F6E56), texte blanc, border-radius 8px, padding 9px
+20px.
+
+Bouton secondaire
+
+Fond transparent, bordure vert primaire 1px, texte vert, même dimensions.
+
+Bouton danger
+
+Fond rouge guinéen (#993C1D), texte blanc — pour les actions
+destructives.
+
+Badge 'Signé'
+
+Fond vert pâle (#E1F5EE), texte vert foncé (#085041), border-radius
+999px.
+
+Badge 'En attente'
+
+Fond or pâle (#FAEEDA), texte or foncé (#633806), border-radius 999px.
+
+Badge 'Refusé'
+
+Fond rouge pâle (#FCEBEB), texte rouge foncé (#791F1F), border-radius
+999px.
+
+Cartes (cards)
+
+Fond blanc, bordure 0.5px gris (#D3D1C7), border-radius 12px, shadow
+légère.
+
+Champs de formulaire
+
+Fond blanc, bordure 0.5px gris, hauteur 36px, focus : bordure vert
+primaire.
+
+Espacement
+
+Grille 4px : gaps internes 4/8px, padding cartes 16-24px, marges sections
+32px.
+
+Icônes
+
+Bibliothèque Heroicons (outline), 20px, couleur vert primaire sur fond clair.
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 13
+
+9. Gestion des Risques
+L'identification et la mitigation des risques font partie intégrante de la bonne gestion d'un projet de
+développement logiciel, même dans un contexte académique.
+Risque
+
+Probabilit
+é
+
+Impact
+
+Mitigation
+
+Complexité de la double
+implémentation
+Laravel/Symfony
+
+Élevée
+
+Élevé
+
+Commencer par V1 (Laravel), documenter
+chaque choix technique avant de porter en
+V2
+
+Difficultés avec la
+signature électronique
+
+Moyenne
+
+Élevé
+
+Spike technique en début de sprint 2 pour
+valider la solution (PDF + champ signature)
+
+Calcul des charges
+sociales guinéennes
+incorrect
+
+Moyenne
+
+Moyen
+
+Consulter le barème CNSS/AGUIPE officiel,
+faire valider par un expert comptable
+
+Retard sur le planning
+(développeuse solo)
+
+Élevée
+
+Moyen
+
+Prioriser le MVP (Must Have), reporter les
+Nice to Have, utiliser l'IA pour accélérer
+
+Problèmes d'hébergem
+ent/déploiement
+
+Faible
+
+Moyen
+
+Utiliser Docker en développement local,
+prévoir un environnement de test séparé
+
+Perte de données
+pendant le
+développement
+
+Faible
+
+Élevé
+
+Versioning Git (GitHub/GitLab), commits
+quotidiens, sauvegardes BDD
+hebdomadaires
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 14
+
+PARTIE II — CONCEPTION DE LA BASE DE
+DONNÉES
+10. Modèle Conceptuel et Logique des Données (MCD/MLD)
+Le modèle de données de GuinéaJob est structuré autour de 11 tables principales organisées en
+domaines fonctionnels : gestion des utilisateurs, des contrats, de la paie, des congés, du recrutement
+et des appels d'offres. Toutes les tables incluent les champs created_at et updated_at (horodatage
+automatique).
+
+10.1 Légende des symboles
+Symbole
+
+Signification
+
+Symbole
+
+Signification
+
+■ PK
+
+Clé primaire (Primary Key)
+
+AI
+
+Auto-incrémenté
+
+■ FK
+
+Clé étrangère (Foreign Key)
+
+NN
+
+Non nul (NOT NULL)
+
+✦ UK
+
+Valeur unique (UNIQUE)
+
+NULL
+
+Valeur optionnelle
+
+10.2 Domaine Utilisateurs
+users
+
+entreprises
+
+■ id
+
+BIGINT
+
+nom
+
+NN
+VARCHAR(100)
+■ user_id
+
+prenom
+email
+password
+role
+
+■ id
+
+PK, AI, NN
+
+NN
+VARCHAR(100)
+raison_sociale
+UK, NN
+VARCHAR(150)
+secteur
+NN
+VARCHAR(255)
+adresse
+NN
+ENUM
+telephone
+
+must_change_pass
+word
+
+BOOLEAN
+
+email_verified_at
+
+TIMESTAMP
+
+NULL
+
+remember_token
+
+VARCHAR(100)
+
+NULL
+
+logo
+
+NN, default 1
+
+employes
+
+BIGINT
+
+■ id
+
+BIGINT
+
+■ user_id
+
+PK, AI, NN
+FK →
+
+users.id, NN
+
+NN
+VARCHAR(200)
+■ entreprise_id
+NULL
+VARCHAR(100)
+poste
+NULL
+TEXT
+date_embauche
+NULL
+VARCHAR(20)
+numero_matricule
+NULL
+VARCHAR(255)
+
+PK, AI, NN
+
+BIGINT
+
+FK →
+
+BIGINT
+
+users.id, NN
+
+FK → entrep
+
+BIGINT
+
+rises.id, NN
+
+VARCHAR(150)
+
+NN
+
+DATE
+
+NN
+
+VARCHAR(50)
+
+Valeurs ENUM role : admin | employeur | employe | candidat | prestataire
+
+10.3 Domaine Contrats
+contrats
+■ id
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+BIGINT
+
+PK, AI, NN
+
+Page 15
+
+UK, NULL
+
+FK →
+
+■ employe_id
+
+BIGINT
+
+employes.id,
+NN
+FK → entrep
+
+■ entreprise_id
+
+BIGINT
+
+type_contrat
+
+ENUM
+
+NN
+
+date_debut
+
+DATE
+
+NN
+
+date_fin
+
+DATE
+
+NULL
+
+salaire_brut
+
+DECIMAL(10,2)
+
+NN
+
+statut
+
+ENUM
+
+clauses
+
+TEXT
+
+NULL
+
+qr_code_token
+
+VARCHAR(64)
+
+UK, NN
+
+pdf_path
+
+VARCHAR(255)
+
+NULL
+
+signed_at
+
+TIMESTAMP
+
+NULL
+
+expire_alerted
+
+BOOLEAN
+
+default 0
+
+rises.id, NN
+
+NN, default
+brouillon
+
+ENUM type_contrat : CDI | CDD | Stage ENUM statut : brouillon | envoye | signe_employeur | signe_employe |
+actif | expire | resilie
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 16
+
+10.4 Domaine Salaires & Fiches de Paie
+fiches_paie
+
+conges
+
+■ id
+
+BIGINT
+
+PK, AI, NN ■ id
+
+■ contrat_id
+
+BIGINT
+
+contrats.id, ■ employe_id
+
+BIGINT
+
+PK, AI, NN
+
+BIGINT
+
+employes.id,
+
+FK →
+
+FK →
+
+NN
+FK →
+
+■ employe_id
+
+BIGINT
+
+NN
+
+type_conge
+
+ENUM
+
+NN
+
+employes.id,
+NN
+
+date_debut
+
+DATE
+
+NN
+
+mois
+
+DATE
+
+NN
+
+date_fin
+
+DATE
+
+NN
+
+salaire_brut
+
+DECIMAL(10,2)
+
+NN
+
+nombre_jours
+
+INT
+
+NN
+
+primes
+
+DECIMAL(10,2)
+
+NN, default 0motif
+
+TEXT
+
+NULL
+
+indemnites
+
+DECIMAL(10,2)
+
+NN, default 0statut
+
+ENUM
+
+retenues
+
+DECIMAL(10,2)
+
+NN, default 0
+
+cotisation_cnss
+
+DECIMAL(10,2)
+
+NN
+
+cotisation_aguipe
+
+DECIMAL(10,2)
+
+NN
+
+salaire_net
+
+DECIMAL(10,2)
+
+NN
+
+qr_code_token
+
+VARCHAR(64)
+
+UK, NN
+
+pdf_path
+
+VARCHAR(255)
+
+NULL
+
+NN, default
+en_attente
+
+commentaire_empl
+oyeur
+
+TEXT
+
+NULL
+
+■ valide_par
+
+BIGINT
+
+users.id,
+
+FK →
+NULL
+
+valide_le
+
+NULL
+
+TIMESTAMP
+
+ENUM type_conge : annuel | maladie | maternite | paternite | sans_solde ENUM statut conge : en_attente |
+valide | refuse
+
+10.5 Domaine Recrutement
+offres_emploi
+
+candidatures
+
+■ id
+
+BIGINT
+
+PK, AI, NN ■ id
+
+■ entreprise_id
+
+BIGINT
+
+titre
+
+VARCHAR(200)
+
+NN
+
+description
+
+TEXT
+
+NN
+
+■ user_id
+
+BIGINT
+
+localisation
+
+VARCHAR(150)
+
+NN
+
+cv_path
+
+VARCHAR(255)
+
+NN
+
+type_contrat
+
+ENUM
+
+NN
+
+lettre_path
+
+VARCHAR(255)
+
+NULL
+
+niveau_etude
+
+VARCHAR(100)
+
+NULL
+
+statut
+
+ENUM
+
+note_recruteur
+
+TEXT
+
+BIGINT
+
+FK → entrep
+
+PK, AI, NN
+FK → offres
+
+rises.id, NN ■ offre_id
+
+BIGINT
+
+_emploi.id,
+NN
+
+experience
+
+VARCHAR(100)
+
+NULL
+
+salaire
+
+VARCHAR(100)
+
+NULL
+
+date_limite
+
+DATE
+
+NN
+
+statut
+
+ENUM
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+FK →
+users.id, NN
+
+NN, default
+recue
+NULL
+
+NN, default
+active
+
+Page 17
+
+10.6 Domaine Appels d'Offres
+appels_offres
+
+reponses_ao
+
+■ id
+
+BIGINT
+
+■ id
+
+■ entreprise_id
+
+BIGINT
+
+titre
+
+VARCHAR(200)
+
+PK, AI, NN
+
+BIGINT
+
+FK → entrep
+rises.id, NN
+■ appel_offre_id
+
+notifications
+■ id
+
+PK, AI, NN
+FK → appels
+
+BIGINT
+
+PK, AI, NN
+
+BIGINT
+
+■ user_id
+
+FK →
+
+BIGINT
+
+_offres.id,
+
+users.id, NN
+
+NN
+NN
+
+■ user_id NN
+
+type
+BIGINT
+
+VARCHAR(100)
+
+NN
+
+VARCHAR(200)
+
+NN
+
+FK →
+
+description
+
+TEXT
+
+cahier_charges_pat
+h
+
+document_path
+NULL
+VARCHAR(255)
+
+message
+VARCHAR(255)
+
+NN
+
+TEXT
+
+NN
+
+montant_propose
+NULL
+DECIMAL(12,2)
+description
+NN
+DATE
+
+data
+DECIMAL(12,2)
+
+NULL
+
+JSON
+
+NULL
+
+NULL
+
+BOOLEAN
+
+NN, default 0
+
+NN, default
+
+TIMESTAMP
+
+NULL
+
+budget_estime
+date_limite
+
+TEXT
+
+titre
+
+lu
+lu_le
+
+statut
+statut
+
+ENUM
+
+NN, default
+
+ENUM
+
+users.id, NN
+
+soumise
+
+active
+
+10.7 Table des Relations (Cardinalités)
+Table source
+
+Relation
+
+Table cible
+
+Cardinalit
+é
+
+Clé étrangère
+
+users
+
+possède
+
+entreprises
+
+1→N
+
+entreprises.user_id
+
+users
+
+possède
+
+employes
+
+1→1
+
+employes.user_id
+
+entreprises
+
+emploie
+
+employes
+
+1→N
+
+employes.entreprise_id
+
+employes
+
+a
+
+contrats
+
+1→N
+
+contrats.employe_id
+
+entreprises
+
+génère
+
+contrats
+
+1→N
+
+contrats.entreprise_id
+
+contrats
+
+génère
+
+fiches_paie
+
+1→N
+
+fiches_paie.contrat_id
+
+employes
+
+soumet
+
+conges
+
+1→N
+
+conges.employe_id
+
+users
+
+valide
+
+conges
+
+1→N
+
+conges.valide_par
+
+entreprises
+
+publie
+
+offres_emploi
+
+1→N
+
+offres_emploi.entreprise_id
+
+users
+
+postule
+
+candidatures
+
+1→N
+
+candidatures.user_id
+
+offres_emploi
+
+reçoit
+
+candidatures
+
+1→N
+
+candidatures.offre_id
+
+entreprises
+
+publie
+
+appels_offres
+
+1→N
+
+appels_offres.entreprise_id
+
+users
+
+répond à
+
+reponses_ao
+
+1→N
+
+reponses_ao.user_id
+
+appels_offres
+
+reçoit
+
+reponses_ao
+
+1→N
+
+reponses_ao.appel_offre_id
+
+users
+
+reçoit
+
+notifications
+
+1→N
+
+notifications.user_id
+
+Domaine
+Utilisateurs
+
+Tables
+users, entreprises, employes
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Nb champs
+23
+
+Page 18
+
+Contrats
+
+contrats
+
+13
+
+Paie
+
+fiches_paie
+
+13
+
+Congés
+
+conges
+
+11
+
+Recrutement
+
+offres_emploi, candidatures
+
+18
+
+Appels d'offres
+
+appels_offres, reponses_ao
+
+15
+
+Notifications
+
+notifications
+
+8
+
+TOTAL
+
+11 tables
+
+101
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 19
+
+10.8 Schéma Visuel de la Base de Données (ERD)
+Le diagramme entité-relation ci-dessous représente l'architecture complète de la base de données de
+GuinéaJob : 11 tables, leurs champs typés avec les clés primaires (PK) et étrangères (FK), ainsi que
+toutes les 15 relations avec leurs cardinalités. Ce schéma est la référence directe pour la création des
+migrations Laravel/Symfony.
+
+Schéma ERD — Base de Données GuinéaJob
+
+Figure 2 — Schéma ERD · GuinéaJob v1.1 · 11 tables · 101 champs · 15 relations
+
+Table
+
+Domaine
+
+Couleur
+ERD
+
+Relations sortantes
+
+users
+
+Utilisateurs
+
+Violet
+
+→ entreprises, employes, notifications,
+candidatures, reponses_ao
+
+entreprises
+
+Utilisateurs
+
+Vert
+
+→ employes, contrats, offres_emploi,
+appels_offres
+
+employes
+
+Utilisateurs
+
+Bleu
+
+→ contrats, fiches_paie, conges
+
+contrats
+
+Contrats
+
+Vert
+
+→ fiches_paie
+
+fiches_paie
+
+Paie
+
+Or
+
+N-1 contrats, N-1 employes
+
+conges
+
+Congés
+
+Rose
+
+N-1 employes, N-1 users (valide_par)
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 20
+
+offres_emploi
+
+Recrutement
+
+Bleu
+
+→ candidatures, N-1 entreprises
+
+candidatures
+
+Recrutement
+
+Bleu
+
+N-1 offres_emploi, N-1 users
+
+appels_offres
+
+Appels
+d'offres
+
+Vert olive
+
+→ reponses_ao, N-1 entreprises
+
+reponses_ao
+
+Appels
+d'offres
+
+Vert olive
+
+N-1 appels_offres, N-1 users
+
+notifications
+
+Notifications
+
+Orange
+
+N-1 users
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 21
+
+11. Diagramme des Cas d'Utilisation (Use Case UML)
+Le diagramme ci-dessous représente l'ensemble des interactions entre les 5 acteurs de GuinéaJob et
+les 17 cas d'utilisation répartis en 5 domaines fonctionnels. Les associations sont colorées par acteur
+pour faciliter la lecture.
+
+Diagramme Use Case — GuinéaJob
+
+Figure 3 — Diagramme des cas d'utilisation UML · GuinéaJob v1.1
+
+Admin
+
+Violet #534AB7
+
+Authentification, supervision contrats, tableau de bord
+global
+
+Employeur
+
+Vert #0F6E56
+
+Contrats, paie, congés, recrutement, appels d'offres
+
+Employé
+
+Bleu #185FA5
+
+Connexion, contrat (lecture/signature), fiches de paie,
+congés
+
+Candidat
+
+Or #BA7517
+
+Postuler à une offre d'emploi
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 22
+
+Prestataire
+
+Vert clair #639922
+
+Répondre à un appel d'offres
+
+Prestataire
+
+Vert clair #639922
+
+Répondre à un appel d'offres
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 23
+
+12. Diagramme de Classes (UML)
+Le diagramme de classes représente la structure statique de GuinéaJob : les 10 classes métier, leurs
+attributs typés, leurs méthodes principales et les associations entre elles. Chaque classe correspond
+directement à une table de la base de données.
+Classe
+
+Couleur
+
+Domaine
+
+Relations principales
+
+User
+
+Violet #534AB7
+
+Utilisateurs
+
+1-N Entreprise, 1-1 Employe, 1-N Notification
+
+Entreprise
+
+Vert #0F6E56
+
+Utilisateurs
+
+1-N Employe, 1-N Contrat, 1-N OffreEmploi,
+1-N AppelOffres
+
+Employe
+
+Bleu #185FA5
+
+Utilisateurs
+
+1-N Contrat, 1-N Conge, 1-N FichePaie
+
+Contrat
+
+Vert #0F6E56
+
+Contrats
+
+1-N FichePaie — ENUMs : CDI|CDD|Stage
+
+FichePaie
+
+Or #BA7517
+
+Paie
+
+N-1 Contrat, N-1 Employe — calcul
+CNSS/AGUIPE
+
+Conge
+
+Rose #D4537E
+
+Congés
+
+N-1 Employe — ENUMs :
+annuel|maladie|sans_solde
+
+OffreEmploi
+
+Bleu #185FA5
+
+Recrutement
+
+1-N Candidature, N-1 Entreprise
+
+Candidature
+
+Bleu #185FA5
+
+Recrutement
+
+N-1 OffreEmploi, N-1 User
+
+AppelOffres
+
+Vert clair
+#639922
+
+Appels
+d'offres
+
+1-N ReponsesAO, N-1 Entreprise
+
+Notification
+
+Orange #D85A30
+
+Notifications
+
+N-1 User — type JSON pour données métier
+
+Aspect
+
+Version Laravel (Eloquent)
+
+Version Symfony (Doctrine)
+
+Héritage
+
+extends Model
+
+#[ORM\Entity] (attribut PHP 8)
+
+Relations
+
+hasMany() / belongsTo() magiques
+
+#[ORM\OneToMany] + ArrayCollection
+
+Accès BDD
+
+Eloquent (ActiveRecord)
+
+EntityManager + Repository
+(DataMapper)
+
+Typage
+
+Propriétés dynamiques (->nom)
+
+Getters/Setters explicites
+
+Services
+
+Facades (PDF::, Mail::)
+
+Injection de dépendances
+(PaieService)
+
+Classes
+
+11 classes (+ ReponseAO ajouté)
+
+11 entités + Repositories + Services
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 24
+
+12.1 Version Laravel — Eloquent ORM (ActiveRecord)
+Version Laravel — Eloquent ORM (ActiveRecord)
+
+Figure 4a — Classes Laravel · Eloquent Model · 11 classes · hasMany/belongsTo · Facades
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 25
+
+12.2 Version Symfony 6 — Doctrine ORM (DataMapper)
+Version Symfony 6 — Doctrine ORM (DataMapper)
+
+Figure 4b — Classes Symfony · Doctrine Entities · 11 entités + Repositories + PaieService
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 26
+
+13. Diagrammes de Séquence (UML)
+Les diagrammes de séquence illustrent les échanges de messages entre les acteurs et les
+composants du système lors des flux métier principaux de GuinéaJob. Quatre flux critiques sont
+documentés ci-dessous.
+Diag
+ram
+me
+
+Flux métier
+
+Acteurs impliqués
+
+Étapes clés
+
+DS1
+
+Connexion
+sécurisée
+
+Utilisateur, AuthController,
+UserModel, SessionService
+
+Saisie → Validation → Hash bcrypt
+→ Session → Dashboard
+
+DS2
+
+Signature
+électronique
+
+Employeur, Employé,
+ContratCtrl, PDFService,
+NotifService
+
+Création → Envoi → Signature →
+PDF+QR → Notification
+
+DS3
+
+Demande de
+congé
+
+Employé, Employeur,
+CongeCtrl, CongeModel,
+NotifService
+
+Soumission → Calcul solde →
+Décision → Notification
+
+DS4
+
+Génération fiche
+de paie
+
+Employeur, Employé, PaieCtrl,
+CalcService, PDFService
+
+Saisie → CNSS/AGUIPE → PDF+QR
+→ Notification
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 27
+
+13.1 Connexion sécurisée
+Flux d'authentification complet depuis la saisie du formulaire jusqu'à la création de la session
+sécurisée. Le mot de passe est vérifié via bcrypt sans jamais être stocké en clair. En cas d'échec, un
+message d'erreur générique est retourné.
+
+DS1 — Connexion sécurisée
+
+Figure 5 — DS1 : Connexion sécurisée · Acteurs : 4 composants · Étapes : 8 messages
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 28
+
+13.2 Signature électronique du contrat
+Flux complet de la création d'un contrat jusqu'à sa signature par l'employé et la génération automatique
+du PDF avec QR Code d'authenticité. Deux notifications email sont envoyées : une à la mise en ligne,
+une à la signature.
+
+DS2 — Signature électronique du contrat
+
+Figure 6 — DS2 : Signature du contrat · Acteurs : 6 composants · Étapes : 12 messages
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 29
+
+13.3 Demande et validation de congé
+Flux de gestion des congés de la soumission par l'employé jusqu'à la décision de l'employeur. Le
+système calcule automatiquement le nombre de jours et vérifie le solde disponible avant d'enregistrer
+la demande.
+
+DS3 — Demande et validation de congé
+
+Figure 7 — DS3 : Demande de congé · Acteurs : 5 composants · Étapes : 10 messages
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 30
+
+13.4 Génération de la fiche de paie
+Flux de génération mensuelle des fiches de paie. Le CalcService applique automatiquement les taux
+légaux guinéens : CNSS 5% et AGUIPE 1% du salaire brut. La fiche PDF avec QR Code est notifiée à
+l'employé par email.
+
+DS4 — Génération de la fiche de paie
+
+Figure 8 — DS4 : Fiche de paie · Acteurs : 6 composants · Étapes : 11 messages
+
+Annexes — Glossaire
+Terme
+
+Définition
+
+API RESTful
+
+Interface de programmation applicative respectant l'architecture REST. Permet la
+communication entre le frontend et le backend via des requêtes HTTP
+standardisées.
+
+RBAC
+
+Role-Based Access Control. Système de contrôle d'accès où les permissions
+sont attribuées selon le rôle de l'utilisateur (Admin, Employeur, Employé).
+
+CSRF
+
+Cross-Site Request Forgery. Attaque informatique contre laquelle Laravel et
+Symfony intègrent une protection native via un token de formulaire.
+
+bcrypt
+
+Algorithme de hachage cryptographique utilisé pour stocker les mots de passe de
+manière sécurisée. Irréversible par conception.
+
+MVC
+
+Modèle-Vue-Contrôleur. Architecture logicielle séparant la logique métier
+(Modèle), la présentation (Vue) et le traitement des requêtes (Contrôleur).
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 31
+
+ORM
+
+Object-Relational Mapping. Technique permettant de manipuler une base de
+données relationnelle via des objets PHP. Eloquent pour Laravel, Doctrine pour
+Symfony.
+
+QR Code
+
+Quick Response Code. Code matriciel contenant une URL, permettant de vérifier
+l'authenticité d'un document en le scannant avec un smartphone.
+
+CDI
+
+Contrat à Durée Indéterminée. Forme standard de contrat de travail sans date de
+fin fixée.
+
+CDD
+
+Contrat à Durée Déterminée. Contrat de travail avec une date de fin prédéfinie,
+renouvelable selon les conditions légales.
+
+CNSS
+
+Caisse Nationale de Sécurité Sociale de Guinée. Organisme gérant les
+cotisations sociales obligatoires des travailleurs guinéens.
+
+AGUIPE
+
+Agence Guinéenne pour la Promotion de l'Emploi. Structure publique guinéenne
+chargée de la promotion de l'emploi.
+
+Scrum
+
+Framework Agile de gestion de projet basé sur des cycles courts (sprints), des
+rôles définis et des cérémonies régulières de revue.
+
+User Story
+
+Description courte d'une fonctionnalité du point de vue d'un utilisateur, au format :
+'En tant que [rôle], je veux [action] afin de [bénéfice]'.
+
+Epic
+
+Grande fonctionnalité ou thème regroupant plusieurs User Stories liées. Niveau
+d'abstraction supérieur dans un backlog Scrum.
+
+MoSCoW
+
+Méthode de priorisation : Must Have (indispensable), Should Have (important),
+Could Have (souhaitable), Won't Have (hors périmètre actuel).
+
+Sprint
+
+Cycle de développement court et fixe (2 semaines ici) pendant lequel une équipe
+livre un incrément du produit.
+
+Backlog
+
+Liste priorisée de toutes les fonctionnalités à développer pour un produit. Le
+Product Backlog contient l'ensemble des User Stories.
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 32
+
+GuinéaJob
+Formaliser le travail, protéger les droits, bâtir l'avenir.
+
+Document rédigé par Kowolé Guilavogui · Matricule 664115632377
+Mai 2026 · Version v1.1
+
+GuinéaJob — Cahier des Charges & Backlog Produit v1.1
+
+Page 33
+
+
