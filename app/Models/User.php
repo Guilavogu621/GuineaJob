@@ -18,6 +18,7 @@ class User extends Authenticatable
         'password',
         'role',
         'must_change_password',
+        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -41,11 +42,11 @@ class User extends Authenticatable
     }
 
     // Vérification des rôles
-    public function isAdmin() { return $this->role === 'admin'; }
-    public function isEmployeur() { return $this->role === 'employeur'; }
-    public function isEmploye() { return $this->role === 'employe'; }
-    public function isCandidat() { return $this->role === 'candidat'; }
-    public function isPrestataire() { return $this->role === 'prestataire'; }
+    public function isAdmin() { return $this->hasRole('admin'); }
+    public function isEmployeur() { return $this->hasRole('employeur'); }
+    public function isEmploye() { return $this->hasRole('employe'); }
+    public function isCandidat() { return $this->hasRole('candidat'); }
+    public function isPrestataire() { return $this->hasRole('prestataire'); }
 
     // Relations
     public function entreprise()
@@ -56,5 +57,13 @@ class User extends Authenticatable
     public function employe()
     {
         return $this->hasOne(Employe::class);
+    }
+
+    /**
+     * Les candidatures déposées par l'utilisateur (si candidat).
+     */
+    public function candidatures()
+    {
+        return $this->hasMany(Candidature::class);
     }
 }

@@ -47,7 +47,7 @@ return new class extends Migration
             $table->enum('genre', ['Masculin', 'Féminin'])->nullable();
             $table->string('adresse')->nullable();
             $table->string('telephone')->nullable();
-            $table->enum('type_contrat', ['CDI', 'CDD'])->default('CDI');
+            $table->enum('type_contrat', ['CDI', 'CDD', 'Stage', 'Prestation'])->default('CDI');
             $table->decimal('salaire_base', 15, 2)->default(0);
             $table->timestamps();
         });
