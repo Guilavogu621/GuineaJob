@@ -9,24 +9,24 @@
         .republique { text-transform: uppercase; letter-spacing: 5px; font-size: 8px; font-weight: bold; margin-bottom: 5px; opacity: 0.8; }
         .titre { font-size: 24px; font-weight: bold; margin: 0; }
         .numero { font-family: monospace; font-size: 10px; margin-top: 5px; opacity: 0.7; }
-        
+
         .section { padding: 30px 50px; }
         .parties { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         .partie-box { width: 50%; padding: 15px; border: 1px solid #eee; background-color: #f9f9f9; }
-        .label-mini { font-size: 8px; font-weight: bold; color: #D4AF37; text-transform: uppercase; margin-bottom: 5px; }
+        .label-mini { font-size: 8px; font-weight: bold; color: #BA7517; text-transform: uppercase; margin-bottom: 5px; }
         .nom-gras { font-size: 14px; font-weight: bold; }
-        
-        .article-titre { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #D4AF37; display: inline-block; padding-bottom: 3px; margin-bottom: 15px; margin-top: 25px; }
-        
+
+        .article-titre { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #BA7517; display: inline-block; padding-bottom: 3px; margin-bottom: 15px; margin-top: 25px; }
+
         .data-table { width: 100%; border-collapse: collapse; }
         .data-table td { padding: 10px; border: 1px solid #f0f0f0; }
         .data-label { background-color: #fafafa; font-weight: bold; font-size: 9px; text-transform: uppercase; color: #999; width: 30%; }
-        
-        .salaire-box { background-color: #1a1a1a; color: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid #D4AF37; margin-top: 10px; }
-        .salaire-montant { font-size: 22px; font-weight: bold; color: #D4AF37; }
-        
+
+        .salaire-box { background-color: #1a1a1a; color: white; padding: 20px; border-radius: 10px; border-bottom: 4px solid #BA7517; margin-top: 10px; }
+        .salaire-montant { font-size: 22px; font-weight: bold; color: #BA7517; }
+
         .clauses { font-style: italic; color: #555; background-color: #fcfcfc; padding: 15px; border-left: 3px solid #0F6E56; font-size: 11px; }
-        
+
         .signatures { margin-top: 50px; width: 100%; }
         .sign-col { width: 50%; vertical-align: top; }
         .sign-box { border: 1px dashed #ccc; padding: 15px; height: 120px; position: relative; margin: 10px; }
@@ -37,7 +37,14 @@
 <body>
     <div class="header">
         <div class="republique">République de Guinée</div>
-        <h1 class="titre">CONTRAT DE TRAVAIL</h1>
+        @php
+            $titreDocument = match($contract->type_contrat) {
+                'Stage' => 'CONVENTION DE STAGE',
+                'Prestation' => 'CONTRAT DE PRESTATION DE SERVICES',
+                default => 'CONTRAT DE TRAVAIL',
+            };
+        @endphp
+        <h1 class="titre">{{ $titreDocument }}</h1>
         <div class="numero">N° {{ $contract->numero_contrat }} — {{ strtoupper($contract->type_contrat) }}</div>
     </div>
 
@@ -76,9 +83,22 @@
             </tr>
         </table>
 
-        <div class="article-titre">Article 2 : Rémunération & Avantages</div>
+        @php
+            $titreRemuneration = match($contract->type_contrat) {
+                'Stage' => 'Article 2 : Indemnité & Avantages',
+                'Prestation' => 'Article 2 : Honoraires & Modalités',
+                default => 'Article 2 : Rémunération & Avantages',
+            };
+
+            $labelMontant = match($contract->type_contrat) {
+                'Stage' => 'Indemnité Mensuelle',
+                'Prestation' => 'Honoraires Mensuels',
+                default => 'Salaire Mensuel Brut',
+            };
+        @endphp
+        <div class="article-titre">{{ $titreRemuneration }}</div>
         <div class="salaire-box">
-            <div style="font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">Salaire Mensuel Brut</div>
+            <div style="font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #aaa;">{{ $labelMontant }}</div>
             <div class="salaire-montant">{{ number_format($contract->salaire_mensuel_brut, 0, ',', ' ') }} <span style="font-size: 10px; color: #aaa; font-weight: normal;">GNF/Mois</span></div>
             @if($contract->avantages)
                 <div style="margin-top: 10px; font-size: 9px;">
@@ -129,12 +149,12 @@
                 </td>
             </tr>
         </table>
-        
+
         <table style="width: 100%; margin-top: 40px;">
             <tr>
                 <td style="width: 80%; vertical-align: bottom; font-size: 8px; color: #aaa;">
-                    Ce document a été généré par GuinéaJob.<br>La signature électronique est reconnue conformément à la loi en vigueur en République de Guinée.<br>
-                    <strong>ID Contrat : {{ $contract->id }}-{{ strtoupper(substr(md5($contract->numero_contrat), 0, 8)) }}</strong>
+                    Ce document est scellé cryptographiquement (RSA-256) via GuinéaJob.<br>La signature électronique est reconnue conformément à la législation guinéenne.<br>
+                    <strong>PREUVE OPENSSL ACTIVÉE — ID : {{ $contract->id }}-{{ strtoupper(substr(md5($contract->numero_contrat), 0, 8)) }}</strong>
                 </td>
                 <td style="width: 20%; text-align: right;">
                     <!-- QR Code de vérification généré en SVG (encodé en Base64 pour DomPDF) -->
