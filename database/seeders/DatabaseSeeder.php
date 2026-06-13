@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $adminRole = Role::updateOrCreate(['name' => 'admin']);
         $employerRole = Role::updateOrCreate(['name' => 'employeur']);
         $employeeRole = Role::updateOrCreate(['name' => 'employe']);
+        $candidatRole = Role::updateOrCreate(['name' => 'candidat']);
+        $prestataireRole = Role::updateOrCreate(['name' => 'prestataire']);
 
         // 2. Création de quelques Permissions de base
         Permission::updateOrCreate(['name' => 'manage users']);
@@ -66,7 +68,7 @@ class DatabaseSeeder extends Seeder
 
         echo "--------------------------------------------------\n";
         echo "Système de Permissions Spatie Initialisé !\n";
-        echo "Rôles créés : admin, employeur, employe\n";
+        echo "Rôles créés : admin, employeur, employe, candidat, prestataire\n";
         echo "--------------------------------------------------\n";
     }
 }
